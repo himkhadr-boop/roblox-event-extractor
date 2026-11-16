@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from starlette.responses import FileResponse
 
 import config
+from discord_store import DiscordStore
 from gemini_vision import GeminiVisionExtractor
 from roblox_verifier import RobloxVerifier
 from xp_engine import XPEngine
@@ -41,6 +42,7 @@ app.add_middleware(
 vision_extractor = GeminiVisionExtractor()
 roblox_verifier = RobloxVerifier()
 xp_engine = XPEngine()
+discord_store = DiscordStore()
 
 # Static assets directory
 static_dir = Path(__file__).resolve().parent / "static"
@@ -58,6 +60,12 @@ class CalculateXPRequest(BaseModel):
     events: List[Dict[str, Any]]
     win_xp: Optional[int] = None
     loss_xp: Optional[int] = None
+
+
+class DiscordMappingPayload(BaseModel):
+    username: Optional[str] = None
+    discord_id: Optional[str] = None
+    mappings: Optional[Dict[str, str]] = None
 
 
 # Endpoints
@@ -128,11 +136,13 @@ async def extract_leaderboard(
                         or roster_map.get(raw_name.lower())
                         or {}
                     )
-                    player["verified_name"] = v_info.get("verified_name")
+                    verified_name = v_info.get("verified_name")
+                    player["verified_name"] = verified_name
                     player["user_id"] = v_info.get("user_id")
                     player["in_clan"] = v_info.get("in_clan", False)
                     player["clan_role"] = v_info.get("clan_role")
                     player["is_verified"] = v_info.get("is_verified", False)
+                    player["discord_id"] = discord_store.get(verified_name) or discord_store.get(raw_name)
 
             processed_events.append(event_data)
         except Exception as e:
@@ -177,6 +187,22 @@ def calculate_xp(payload: CalculateXPRequest):
     except Exception as e:
         logger.error(f"XP calculation failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"XP calculation failed: {str(e)}")
+
+
+@app.get("/api/discord_ids")
+def get_discord_ids():
+    """Returns stored Roblox-to-Discord ID mappings."""
+    return {"mappings": discord_store.get_all()}
+
+
+@app.post("/api/discord_ids")
+def update_discord_ids(payload: DiscordMappingPayload):
+    """Updates one or multiple Roblox-to-Discord ID mappings."""
+    if payload.mappings is not None:
+        discord_store.bulk_set(payload.mappings)
+    elif payload.username is not None:
+        discord_store.set(payload.username, payload.discord_id)
+    return {"status": "ok", "mappings": discord_store.get_all()}
 
 
 @app.get("/api/health")

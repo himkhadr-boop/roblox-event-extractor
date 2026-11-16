@@ -171,6 +171,47 @@
       background: var(--bg-surface-active);
     }
 
+    /* Cloud Sync Status Pill */
+    .sync-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+
+    .sync-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--accent-emerald);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .sync-dot.syncing {
+      background-color: var(--accent-blue);
+      box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
+      animation: pulseSync 1s infinite alternate;
+    }
+
+    .sync-dot.offline {
+      background-color: var(--accent-amber);
+      box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
+    }
+
+    @keyframes pulseSync {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
     .brand-subtitle {
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -1356,6 +1397,10 @@
               <span style="opacity: 0.6;">(ID: <span id="navClanId">825966682</span>)</span>
               <span>⚙️</span>
             </div>
+            <div class="sync-status-pill" id="cloudSyncPill" title="Server Discord ID Cloud Synchronization">
+              <span class="sync-dot"></span>
+              <span id="cloudSyncText">Cloud Sync: Connected</span>
+            </div>
           </div>
           <span class="brand-subtitle">Event Attendance &amp; Clan Labs Slash Command Generator</span>
         </div>
@@ -1565,8 +1610,14 @@
         </div>
         <div class="form-group" style="padding-top: 6px; border-top: 1px solid var(--border-subtle);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <label class="form-label">Discord ID Local Cache</label>
-            <span id="discordIdCacheCount" style="font-size: 0.725rem; color: var(--text-muted); font-family: var(--font-mono);">0 cached</span>
+            <label class="form-label">Discord ID Cloud &amp; Local Cache</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="discordIdCacheCount" style="font-size: 0.725rem; color: var(--text-muted); font-family: var(--font-mono);">0 cached</span>
+              <div class="sync-status-pill" id="modalCloudSyncPill">
+                <span class="sync-dot"></span>
+                <span id="modalCloudSyncText">Cloud Sync: Connected</span>
+              </div>
+            </div>
           </div>
           <button id="clearDiscordCacheBtn" class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 4px;">
             Clear Stored Discord IDs
@@ -1660,6 +1711,129 @@
         if (el) el.textContent = `${count} cached ID(s)`;
       }
 
+      // Cloud Sync UI Status Indicator
+      function setSyncStatus(status, text) {
+        const defaultText =
+          status === "connected"
+            ? "Cloud Sync: Connected"
+            : status === "syncing"
+            ? "Cloud Sync: Syncing..."
+            : "Cloud Sync: Offline";
+        const msg = text || defaultText;
+
+        const mainTextEl = document.getElementById("cloudSyncText");
+        const modalTextEl = document.getElementById("modalCloudSyncText");
+        if (mainTextEl) mainTextEl.textContent = msg;
+        if (modalTextEl) modalTextEl.textContent = msg;
+
+        const dots = document.querySelectorAll(".sync-dot");
+        dots.forEach((dot) => {
+          dot.className = "sync-dot" + (status === "syncing" ? " syncing" : status === "offline" ? " offline" : "");
+        });
+      }
+
+      // Sync Discord IDs with Server on Load
+      async function syncDiscordIdsWithServer() {
+        setSyncStatus("syncing", "Cloud Sync: Syncing...");
+        try {
+          const res = await fetch("/api/discord_ids");
+          if (!res.ok) {
+            throw new Error(`Server returned status ${res.status}`);
+          }
+          const data = await res.json();
+          const serverMappings =
+            data && data.mappings && typeof data.mappings === "object"
+              ? data.mappings
+              : data && typeof data === "object"
+              ? data
+              : {};
+
+          // Check if localStorage has any keys not on server; push to server if so
+          const localKeysToPush = {};
+          for (const [k, v] of Object.entries(state.discordIds)) {
+            const cleanKey = (k || "").trim().toLowerCase();
+            const cleanVal = (v || "").trim();
+            if (cleanKey && cleanVal && !serverMappings[cleanKey]) {
+              localKeysToPush[cleanKey] = cleanVal;
+            }
+          }
+
+          if (Object.keys(localKeysToPush).length > 0) {
+            try {
+              await fetch("/api/discord_ids", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mappings: localKeysToPush }),
+              });
+            } catch (pushErr) {
+              console.warn("Failed pushing local mappings to server:", pushErr);
+            }
+          }
+
+          // Merge server mappings into state.discordIds
+          for (const [k, v] of Object.entries(serverMappings)) {
+            const cleanKey = (k || "").trim().toLowerCase();
+            const cleanVal = cleanDiscordId(v);
+            if (cleanKey && cleanVal) {
+              state.discordIds[cleanKey] = cleanVal;
+            }
+          }
+
+          savePersistedDiscordIds();
+          updateCacheCountUI();
+          setSyncStatus("connected", "Cloud Sync: Connected");
+
+          // Propagate merged IDs to active events
+          applyDiscordIdsToEvents();
+        } catch (err) {
+          console.warn("Could not sync with /api/discord_ids, using offline local cache:", err);
+          setSyncStatus("offline", "Cloud Sync: Offline");
+        }
+      }
+
+      function applyDiscordIdsToEvents() {
+        let changed = false;
+        state.events.forEach((evt) => {
+          evt.teams.forEach((team) => {
+            (team.players || []).forEach((p) => {
+              const pKey = (p.verified_name || p.username || "").toLowerCase();
+              if (pKey && state.discordIds[pKey] && p.discord_id !== state.discordIds[pKey]) {
+                p.discord_id = state.discordIds[pKey];
+                changed = true;
+              }
+            });
+          });
+        });
+        if (changed) {
+          updateAllClanLabsBoxes();
+        }
+      }
+
+      // Sync Single Discord ID Change to Server
+      async function syncSingleDiscordIdToServer(username, cleanId) {
+        if (!username) return;
+        try {
+          setSyncStatus("syncing", "Cloud Sync: Saving...");
+          const res = await fetch("/api/discord_ids", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: username,
+              discord_id: cleanId || "",
+            }),
+          });
+          if (res.ok) {
+            setSyncStatus("connected", "Cloud Sync: Connected");
+          } else {
+            console.warn("Server responded with error while syncing Discord ID:", res.status);
+            setSyncStatus("offline", "Cloud Sync: Error");
+          }
+        } catch (err) {
+          console.warn("Failed to sync Discord ID to server:", err);
+          setSyncStatus("offline", "Cloud Sync: Offline");
+        }
+      }
+
       function cleanDiscordId(raw) {
         if (!raw) return "";
         const str = String(raw).trim();
@@ -1681,6 +1855,9 @@
         }
         savePersistedDiscordIds();
 
+        // Server Sync on Change: call POST /api/discord_ids
+        syncSingleDiscordIdToServer(username, cleaned);
+
         // Update all active events for this player
         state.events.forEach((evt) => {
           evt.teams.forEach((team) => {
@@ -1693,7 +1870,7 @@
           });
         });
 
-        // Re-render slash command box on active cards
+        // Recalculate Clan Labs slash command live
         updateAllClanLabsBoxes();
       }
 
@@ -1779,6 +1956,9 @@
       async function initConfig() {
         loadPersistedDiscordIds();
         updateCacheCountUI();
+
+        // Server Sync on Load: fetch GET /api/discord_ids and sync bidirectional
+        syncDiscordIdsWithServer();
 
         try {
           const res = await fetch("/api/config");
@@ -1959,14 +2139,17 @@
               }
             });
 
-            // Cache player roles and pre-fill discord IDs from persistence
+            // Cache player roles and pre-fill discord IDs from persistence/server
             teams.forEach((t) => {
               (t.players || []).forEach((p) => {
                 const name = p.verified_name || p.username;
                 if (name) {
                   const key = name.toLowerCase();
                   if (p.clan_role) state.playerRoles[key] = p.clan_role;
-                  if (state.discordIds[key]) {
+                  if (p.discord_id && !state.discordIds[key]) {
+                    state.discordIds[key] = p.discord_id;
+                    savePersistedDiscordIds();
+                  } else if (state.discordIds[key]) {
                     p.discord_id = state.discordIds[key];
                   }
                 }
