@@ -3,53 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Winslow Accord Ops — Event Attendance & XP Engine</title>
+  <title>Winslow Accord / Events</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Dark slate matte color scheme (Linear / Discord / Steam aesthetic) */
-      --bg-canvas: #0c0e14;
-      --bg-surface: #12151e;
-      --bg-surface-elevated: #181c27;
-      --bg-surface-active: #1f2433;
-      --bg-card: #151823;
-      --bg-codebox: #0a0c12;
-      --bg-input: #0f121b;
-      
-      --border-subtle: #212636;
-      --border-medium: #2a3145;
-      --border-focus: #3b82f6;
+      /* Neutral Matte & High Contrast — Vercel / Linear Style */
+      --bg-canvas: #090a0f;
+      --bg-surface: #12151c;
+      --bg-surface-elevated: #161922;
+      --bg-surface-active: #1c212d;
+      --bg-card: #12151c;
+      --bg-codebox: #0b0d12;
+      --bg-input: #0c0e14;
+      --bg-dropzone: #0e1117;
+
+      --border-subtle: #1e232e;
+      --border-medium: #262c3a;
+      --border-strong: #363e52;
 
       --text-primary: #f3f4f6;
-      --text-secondary: #9aa5b8;
-      --text-muted: #626e85;
-      --text-inverse: #0c0e14;
-
-      --accent-blue: #3b82f6;
-      --accent-blue-hover: #2563eb;
-      --accent-blurple: #5865f2;
+      --text-secondary: #8b949e;
+      --text-muted: #6b7280;
 
       --accent-emerald: #10b981;
       --accent-emerald-subtle: rgba(16, 185, 129, 0.12);
-      --accent-emerald-border: rgba(16, 185, 129, 0.35);
+      --accent-emerald-border: rgba(16, 185, 129, 0.3);
 
       --accent-red: #ef4444;
       --accent-red-subtle: rgba(239, 68, 68, 0.12);
-      --accent-red-border: rgba(239, 68, 68, 0.35);
+      --accent-red-border: rgba(239, 68, 68, 0.3);
 
       --accent-amber: #f59e0b;
       --accent-amber-subtle: rgba(245, 158, 11, 0.12);
-      --accent-amber-border: rgba(245, 158, 11, 0.35);
+      --accent-amber-border: rgba(245, 158, 11, 0.3);
 
-      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --accent-blue: #3b82f6;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-      --radius-sm: 5px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --shadow-surface: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
     }
 
     * {
@@ -62,7 +59,7 @@
       background-color: var(--bg-canvas);
       color: var(--text-primary);
       font-family: var(--font-sans);
-      font-size: 0.875rem;
+      font-size: 13px;
       line-height: 1.5;
       min-height: 100vh;
       display: flex;
@@ -73,33 +70,33 @@
 
     /* Scrollbars */
     ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
       background: var(--bg-canvas);
     }
     ::-webkit-scrollbar-thumb {
       background: var(--border-medium);
-      border-radius: 4px;
+      border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #3a445f;
+      background: var(--border-strong);
     }
 
     /* Top Navigation Bar */
     header.navbar {
-      background: rgba(12, 14, 20, 0.92);
+      background: rgba(9, 10, 15, 0.94);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
       position: sticky;
       top: 0;
       z-index: 50;
-      padding: 12px 24px;
+      padding: 10px 24px;
     }
 
     .navbar-inner {
-      max-width: 1480px;
+      max-width: 1440px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -112,13 +109,14 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .brand-crest {
-      width: 38px;
-      height: 38px;
+      width: 32px;
+      height: 32px;
       border-radius: var(--radius-md);
-      background: #181d2a;
+      background: #161922;
       border: 1px solid var(--border-medium);
       display: flex;
       align-items: center;
@@ -128,47 +126,62 @@
     }
 
     .brand-crest svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
     }
 
-    .brand-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand-title-row {
+    .brand-breadcrumb {
       display: flex;
       align-items: center;
-      gap: 8px;
+      font-size: 13px;
     }
 
-    .brand-title {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
+    .brand-org {
+      font-weight: 600;
       color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-divider {
+      color: #4b5563;
+      margin: 0 6px;
+    }
+
+    .brand-app {
+      font-weight: 500;
+      color: var(--text-secondary);
     }
 
     .clan-status-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-size: 0.725rem;
-      font-weight: 600;
+      background: #161922;
+      border: 1px solid var(--border-medium);
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.15s ease;
     }
 
     .clan-status-pill:hover {
-      border-color: var(--border-medium);
+      border-color: var(--border-strong);
       color: var(--text-primary);
-      background: var(--bg-surface-active);
+      background: #1c212d;
+    }
+
+    .clan-id-tag {
+      color: #6b7280;
+      font-family: var(--font-mono);
+    }
+
+    .gear-icon {
+      width: 12px;
+      height: 12px;
+      color: #6b7280;
     }
 
     /* Cloud Sync Status Pill */
@@ -176,12 +189,12 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--bg-surface-elevated);
+      background: #161922;
       border: 1px solid var(--border-subtle);
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-size: 0.725rem;
-      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--text-secondary);
       user-select: none;
     }
@@ -191,39 +204,31 @@
       height: 6px;
       border-radius: 50%;
       background-color: var(--accent-emerald);
-      box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
       flex-shrink: 0;
       transition: all 0.2s ease;
     }
 
     .sync-dot.syncing {
       background-color: var(--accent-blue);
-      box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
       animation: pulseSync 1s infinite alternate;
     }
 
     .sync-dot.offline {
       background-color: var(--accent-amber);
-      box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
     }
 
     @keyframes pulseSync {
-      from { opacity: 0.4; }
+      from { opacity: 0.3; }
       to { opacity: 1; }
-    }
-
-    .brand-subtitle {
-      font-size: 0.75rem;
-      color: var(--text-muted);
     }
 
     .navbar-stats {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 12px;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      padding: 5px 14px;
+      padding: 4px 12px;
       border-radius: var(--radius-md);
     }
 
@@ -231,7 +236,7 @@
       display: flex;
       align-items: baseline;
       gap: 6px;
-      font-size: 0.75rem;
+      font-size: 11px;
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
@@ -239,17 +244,23 @@
     }
 
     .nav-stat-value {
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-primary);
       font-variant-numeric: tabular-nums;
       font-family: var(--font-mono);
     }
 
+    .nav-stat-divider {
+      width: 1px;
+      height: 12px;
+      background: var(--border-subtle);
+    }
+
     .navbar-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
@@ -258,14 +269,14 @@
       align-items: center;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 3px 6px;
+      border-radius: var(--radius-md);
+      padding: 3px 8px;
       gap: 4px;
     }
 
     .xp-pill-label {
-      font-size: 0.725rem;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
@@ -274,155 +285,165 @@
     .xp-pill-label.loss { color: var(--accent-red); }
 
     .xp-pill-input {
-      width: 44px;
+      width: 36px;
       background: transparent;
       border: none;
       color: var(--text-primary);
-      font-size: 0.85rem;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 600;
       text-align: center;
       outline: none;
       font-family: var(--font-mono);
     }
 
-    /* Standard Button Styles */
+    /* Vercel / Linear Style Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      padding: 7px 13px;
-      font-size: 0.825rem;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
       border: 1px solid transparent;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
       user-select: none;
       font-family: var(--font-sans);
+      line-height: 1.4;
     }
 
     .btn svg {
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
       flex-shrink: 0;
     }
 
+    /* Primary Action Buttons: Solid crisp white with black text */
     .btn-primary {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: #3b82f6;
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      font-weight: 500;
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #1d4ed8;
-      border-color: #2563eb;
+      background: #e5e7eb;
+      border-color: #e5e7eb;
+      color: #000000;
     }
 
     .btn-primary:disabled {
+      background: #1c212d;
+      color: #525a6c;
+      border-color: #262c3a;
+      cursor: not-allowed;
+    }
+
+    /* Secondary Buttons: Dark surface with crisp border */
+    .btn-secondary {
+      background: #181c25;
+      border: 1px solid #262c3a;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #202533;
+      border-color: #384257;
+      color: #ffffff;
+    }
+
+    .btn-secondary:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .btn-secondary {
-      background: var(--bg-surface-elevated);
-      border-color: var(--border-subtle);
-      color: var(--text-secondary);
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: var(--bg-surface-active);
-      color: var(--text-primary);
-      border-color: var(--border-medium);
-    }
-
     .btn-copy {
-      background: #1a2030;
-      border: 1px solid #2f3852;
-      color: #dbeafe;
+      background: #181c25;
+      border: 1px solid #262c3a;
+      color: #e2e8f0;
+      font-weight: 500;
     }
 
     .btn-copy:hover {
-      background: #222b42;
-      border-color: #3b82f6;
+      background: #202533;
+      border-color: #384257;
       color: #ffffff;
     }
 
     .btn-danger-ghost {
       background: transparent;
       border: 1px solid transparent;
-      color: var(--text-muted);
-      padding: 5px 8px;
+      color: #6b7280;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
     }
 
     .btn-danger-ghost:hover {
       color: var(--accent-red);
-      background: var(--accent-red-subtle);
-      border-color: var(--accent-red-border);
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
     }
 
     .btn-sm {
-      padding: 5px 10px;
-      font-size: 0.775rem;
+      padding: 4px 9px;
+      font-size: 11px;
     }
 
     /* Main Container */
     .container {
-      max-width: 1480px;
+      max-width: 1440px;
       margin: 0 auto;
-      padding: 20px 24px;
+      padding: 24px;
       width: 100%;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 20px;
     }
 
     /* Cards & Panels */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: var(--shadow-surface);
     }
 
     .card-header {
-      padding: 13px 18px;
-      background: var(--bg-surface);
+      padding: 12px 18px;
+      background: #0e1117;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .card-title-group {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
       gap: 8px;
     }
 
-    .card-title svg {
-      width: 18px;
-      height: 18px;
-      color: var(--accent-blue);
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
     }
 
     .card-subtitle {
-      font-size: 0.75rem;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
@@ -433,41 +454,46 @@
     /* Minimalist File Dropzone */
     .dropzone-container {
       border: 1px dashed var(--border-medium);
-      border-radius: var(--radius-md);
-      background: var(--bg-surface);
-      padding: 32px 20px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-dropzone);
+      padding: 36px 20px;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s ease;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .dropzone-container:hover,
     .dropzone-container.dragover {
-      border-color: var(--accent-blue);
-      background: #141926;
+      border-color: #4b5563;
+      background: #121620;
     }
 
     .dropzone-icon {
-      width: 36px;
-      height: 36px;
+      width: 18px;
+      height: 18px;
       color: var(--text-secondary);
-      margin: 0 auto 10px;
+      margin-bottom: 10px;
+      transition: color 0.15s ease;
     }
 
     .dropzone-container:hover .dropzone-icon {
-      color: var(--accent-blue);
+      color: var(--text-primary);
     }
 
     .dropzone-title {
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 500;
       color: var(--text-primary);
       margin-bottom: 4px;
     }
 
     .dropzone-hint {
-      font-size: 0.775rem;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
@@ -483,9 +509,9 @@
     /* Staged Files Preview */
     .staged-files-wrap {
       margin-top: 14px;
-      background: var(--bg-surface);
+      background: #0e1117;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       padding: 12px 14px;
     }
 
@@ -494,31 +520,33 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 10px;
-      font-size: 0.8rem;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .staged-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
     }
 
     .file-chip {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      padding: 6px 8px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       position: relative;
     }
 
     .file-chip-thumb {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 4px;
       background: #181d2a;
       object-fit: cover;
@@ -532,8 +560,8 @@
     }
 
     .file-chip-name {
-      font-size: 0.775rem;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
@@ -541,7 +569,7 @@
     }
 
     .file-chip-size {
-      font-size: 0.7rem;
+      font-size: 10px;
       color: var(--text-muted);
       font-family: var(--font-mono);
     }
@@ -556,11 +584,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: color 0.15s ease;
     }
 
     .file-chip-remove:hover {
       color: var(--accent-red);
-      background: var(--accent-red-subtle);
     }
 
     /* Extract Action Bar */
@@ -579,24 +607,19 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.8rem;
+      font-size: 12px;
       color: var(--text-secondary);
     }
 
     /* Spinner */
     .spinner {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border: 2px solid rgba(255, 255, 255, 0.2);
-      border-top-color: #ffffff;
+      border-top-color: currentColor;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      animation: spin 0.6s linear infinite;
       display: inline-block;
-    }
-
-    .spinner.blue {
-      border-color: rgba(59, 130, 246, 0.2);
-      border-top-color: var(--accent-blue);
     }
 
     @keyframes spin {
@@ -607,42 +630,42 @@
     .events-stack {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .event-card {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       overflow: hidden;
     }
 
     .event-header {
-      padding: 12px 16px;
-      background: var(--bg-surface);
+      padding: 10px 16px;
+      background: #0e1117;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .event-title-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex: 1;
-      min-width: 240px;
+      min-width: 220px;
     }
 
     .event-num-badge {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      padding: 2px 7px;
+      background: #181c25;
+      border: 1px solid var(--border-medium);
+      padding: 2px 6px;
       border-radius: var(--radius-sm);
-      font-size: 0.725rem;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--text-muted);
       font-family: var(--font-mono);
     }
@@ -652,17 +675,17 @@
       border: 1px solid transparent;
       border-radius: var(--radius-sm);
       color: var(--text-primary);
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       padding: 3px 6px;
       width: 100%;
-      max-width: 360px;
+      max-width: 320px;
       transition: all 0.15s ease;
     }
 
     .event-title-input:hover {
       border-color: var(--border-medium);
-      background: var(--bg-surface-elevated);
+      background: #161922;
     }
 
     .event-title-input:focus {
@@ -674,50 +697,52 @@
     .event-controls {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
 
     /* Crisp Segmented Pill Toggle for Win/Loss */
     .win-loss-segmented {
       display: inline-flex;
-      background: var(--bg-input);
+      background: #0c0e14;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       padding: 2px;
       gap: 2px;
       user-select: none;
     }
 
     .segmented-btn {
-      padding: 4px 11px;
-      font-size: 0.75rem;
-      font-weight: 700;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
       letter-spacing: 0.02em;
       border-radius: 4px;
       cursor: pointer;
       border: 1px solid transparent;
-      color: var(--text-muted);
+      color: #6b7280;
       transition: all 0.15s ease;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+      background: transparent;
+      font-family: var(--font-sans);
+    }
+
+    .segmented-btn:not(.active):hover {
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .segmented-btn.active.win {
-      background: var(--accent-emerald-subtle);
-      border-color: var(--accent-emerald-border);
+      background: #0d281e;
+      border-color: rgba(16, 185, 129, 0.35);
       color: #34d399;
     }
 
     .segmented-btn.active.loss {
-      background: var(--accent-red-subtle);
-      border-color: var(--accent-red-border);
+      background: #2b1114;
+      border-color: rgba(239, 68, 68, 0.35);
       color: #f87171;
-    }
-
-    .segmented-btn:not(.active):hover {
-      color: var(--text-secondary);
-      background: rgba(255, 255, 255, 0.03);
     }
 
     /* Team Tabs Selector */
@@ -726,24 +751,24 @@
       align-items: center;
       gap: 6px;
       padding: 8px 16px;
-      background: var(--bg-surface-elevated);
+      background: #0e1117;
       border-bottom: 1px solid var(--border-subtle);
       overflow-x: auto;
     }
 
     .team-tab-label {
-      font-size: 0.725rem;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      color: #6b7280;
       margin-right: 4px;
     }
 
     .team-tab {
       padding: 4px 10px;
-      font-size: 0.775rem;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       border-radius: var(--radius-sm);
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
@@ -762,21 +787,22 @@
     }
 
     .team-tab.active {
-      background: #1e2638;
+      background: #181c26;
       border-color: var(--accent-blue);
-      color: #bfdbfe;
-      font-weight: 700;
+      color: #f3f4f6;
+      font-weight: 600;
     }
 
     .team-clan-chip {
-      font-size: 0.675rem;
+      font-size: 10px;
       padding: 1px 5px;
-      background: var(--accent-emerald-subtle);
-      border: 1px solid var(--accent-emerald-border);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: #34d399;
       border-radius: 3px;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     /* High-Density Roster Table */
@@ -792,51 +818,52 @@
     .roster-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.825rem;
+      font-size: 12px;
       text-align: left;
     }
 
     .roster-table th {
-      padding: 7px 10px;
-      font-size: 0.7rem;
-      font-weight: 700;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-muted);
+      color: #6b7280;
       border-bottom: 1px solid var(--border-subtle);
       white-space: nowrap;
     }
 
     .roster-table td {
-      padding: 7px 10px;
-      border-bottom: 1px solid rgba(33, 38, 54, 0.7);
+      padding: 8px 12px;
+      border-bottom: 1px solid #161a23;
       vertical-align: middle;
     }
 
     .roster-table tr:hover td {
-      background: rgba(255, 255, 255, 0.015);
+      background: #151922;
     }
 
     /* Player cell */
     .player-cell {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
     }
 
     .player-avatar {
-      width: 26px;
-      height: 26px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      background: #1b202e;
+      background: #181c25;
       border: 1px solid var(--border-medium);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #cbd5e1;
-      font-weight: 700;
-      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 10px;
       flex-shrink: 0;
+      font-family: var(--font-sans);
     }
 
     .player-name-col {
@@ -845,12 +872,13 @@
     }
 
     .player-name-text {
-      font-weight: 600;
+      font-weight: 500;
       color: var(--text-primary);
+      font-size: 12px;
     }
 
     .disambig-tag {
-      font-size: 0.675rem;
+      font-size: 10px;
       color: var(--accent-amber);
       font-family: var(--font-mono);
       opacity: 0.9;
@@ -861,8 +889,8 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 0.725rem;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
     }
 
     .status-dot {
@@ -874,31 +902,29 @@
 
     .status-dot.verified {
       background-color: var(--accent-emerald);
-      box-shadow: 0 0 5px rgba(16, 185, 129, 0.6);
     }
 
     .status-dot.unverified {
       background-color: var(--accent-amber);
     }
 
-    /* Discord-Style Role Chip */
+    /* Minimalist Dark Gray Role Pill with 5px Colored Rank Dot */
     .role-chip {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: #161a25;
-      border: 1px solid #23293a;
+      background: #181c25;
+      border: 1px solid #262c3a;
+      color: #cbd5e1;
+      font-size: 11px;
       padding: 2px 7px;
       border-radius: 4px;
-      font-size: 0.725rem;
-      font-weight: 600;
-      color: var(--text-secondary);
       white-space: nowrap;
     }
 
     .role-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -907,9 +933,9 @@
     .role-dot.captain { background-color: #3b82f6; }
     .role-dot.member { background-color: #10b981; }
     .role-dot.private { background-color: #94a3b8; }
-    .role-dot.guest { background-color: #475569; }
+    .role-dot.guest { background-color: #4b5563; }
 
-    /* Inline Discord ID Input */
+    /* Inline Monospace Discord ID Input */
     .discord-id-cell-wrap {
       display: flex;
       align-items: center;
@@ -918,25 +944,25 @@
 
     .discord-id-input {
       background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid #212735;
       border-radius: 4px;
-      color: var(--text-primary);
-      padding: 4px 7px;
-      font-size: 0.75rem;
+      color: #93c5fd;
+      padding: 4px 8px;
+      font-size: 12px;
       font-family: var(--font-mono);
-      width: 170px;
+      width: 180px;
       transition: all 0.15s ease;
     }
 
     .discord-id-input:focus {
       outline: none;
       border-color: var(--accent-blue);
-      background: #141926;
+      background: #10141f;
     }
 
     .discord-id-input.missing {
-      border-color: var(--accent-amber-border);
-      background: rgba(245, 158, 11, 0.05);
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.04);
     }
 
     .discord-id-input.pulse-highlight {
@@ -944,15 +970,15 @@
     }
 
     @keyframes pulseHighlight {
-      0% { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
-      50% { border-color: #3b82f6; box-shadow: 0 0 14px rgba(59, 130, 246, 0.8); }
-      100% { border-color: var(--border-subtle); box-shadow: none; }
+      0% { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
+      50% { border-color: var(--accent-blue); box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
+      100% { border-color: #212735; box-shadow: none; }
     }
 
     .stat-num {
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
-      font-size: 0.8rem;
+      font-size: 12px;
       color: var(--text-primary);
       text-align: center;
     }
@@ -962,14 +988,14 @@
       margin-top: 14px;
       background: var(--bg-codebox);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       overflow: hidden;
       flex-shrink: 0;
     }
 
     .clan-labs-header {
       padding: 8px 12px;
-      background: #0f121a;
+      background: #11141c;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
@@ -978,52 +1004,65 @@
       gap: 8px;
     }
 
-    .clan-labs-title {
+    .clan-labs-title-wrap {
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-size: 0.775rem;
-      font-weight: 700;
-      color: #93c5fd;
+      gap: 8px;
+    }
+
+    .clan-labs-title {
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+    }
+
+    .clan-labs-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #181c25;
+      border: 1px solid #262c3a;
+      color: #cbd5e1;
+      font-family: var(--font-mono);
     }
 
     .clan-labs-codebox {
       padding: 10px 14px;
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 12px;
       color: #e2e8f0;
       white-space: pre-wrap;
       word-break: break-all;
       user-select: all;
       line-height: 1.6;
-      background: #07090e;
+      background: #080a0e;
       min-height: 38px;
       overflow-x: auto;
     }
 
-    .clan-labs-codebox .cmd-root { color: #60a5fa; font-weight: 700; }
-    .clan-labs-codebox .cmd-param { color: #c084fc; }
+    /* Syntax Highlighting without Neon Glow */
+    .clan-labs-codebox .cmd-root { color: #f3f4f6; font-weight: 600; }
+    .clan-labs-codebox .cmd-param { color: #8b949e; }
     .clan-labs-codebox .cmd-id { color: #93c5fd; }
-    .clan-labs-codebox .cmd-missing { color: #f87171; background: rgba(239, 68, 68, 0.15); padding: 1px 4px; border-radius: 3px; }
-    .clan-labs-codebox .cmd-action { color: #34d399; font-weight: 600; }
-    .clan-labs-codebox .cmd-amount { color: #fbbf24; font-weight: 700; }
-
-    #batchCommandsContainer {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 480px;
-      overflow-y: auto;
-      padding-right: 4px;
+    .clan-labs-codebox .cmd-missing {
+      color: #fca5a5;
+      background: #3b1219;
+      border: 1px solid #5c1d27;
+      padding: 1px 5px;
+      border-radius: 3px;
     }
+    .clan-labs-codebox .cmd-action { color: #86efac; font-weight: 500; }
+    .clan-labs-codebox .cmd-amount { color: #fde047; font-weight: 600; }
 
+    /* Missing Discord ID Warning Banner */
     .clan-labs-missing-alert {
       padding: 6px 12px;
-      background: rgba(245, 158, 11, 0.08);
-      border-top: 1px solid rgba(245, 158, 11, 0.2);
-      font-size: 0.725rem;
+      background: #191408;
+      border-top: 1px solid #332200;
+      font-size: 11px;
       color: #fbbf24;
       display: flex;
       align-items: center;
@@ -1032,18 +1071,21 @@
     }
 
     .missing-player-jump {
-      background: rgba(245, 158, 11, 0.2);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      border-radius: 3px;
-      padding: 1px 6px;
+      background: #2a1f0a;
+      border: 1px solid #4a3810;
+      border-radius: 4px;
+      padding: 1px 7px;
       cursor: pointer;
       color: #fde68a;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: var(--font-mono);
       transition: all 0.15s ease;
     }
 
     .missing-player-jump:hover {
-      background: rgba(245, 158, 11, 0.35);
+      background: #3d2c0e;
+      border-color: #634a15;
       color: #ffffff;
     }
 
@@ -1054,19 +1096,27 @@
       align-items: center;
       gap: 8px;
       padding: 8px 10px;
-      background: var(--bg-surface);
-      border: 1px dashed var(--border-subtle);
-      border-radius: var(--radius-sm);
+      background: #0e1117;
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
       flex-wrap: wrap;
+    }
+
+    .add-player-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .add-player-input {
       background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid #212735;
       border-radius: 4px;
       color: var(--text-primary);
       padding: 4px 8px;
-      font-size: 0.8rem;
+      font-size: 12px;
       flex: 1;
       min-width: 140px;
     }
@@ -1079,11 +1129,11 @@
     .stat-input-mini {
       width: 58px;
       background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid #212735;
       border-radius: 4px;
       color: var(--text-primary);
       padding: 4px 6px;
-      font-size: 0.8rem;
+      font-size: 12px;
       text-align: center;
       font-family: var(--font-mono);
     }
@@ -1096,15 +1146,15 @@
     /* KPI Summary Cards */
     .kpi-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
       margin-bottom: 18px;
     }
 
     .kpi-card {
-      background: var(--bg-surface);
+      background: #0e1117;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-md);
       padding: 12px 16px;
       display: flex;
       flex-direction: column;
@@ -1112,16 +1162,16 @@
     }
 
     .kpi-title {
-      font-size: 0.725rem;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       color: var(--text-muted);
     }
 
     .kpi-val {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 600;
       color: var(--text-primary);
       font-family: var(--font-mono);
       line-height: 1.2;
@@ -1134,7 +1184,7 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .search-box {
@@ -1147,19 +1197,19 @@
       left: 9px;
       top: 50%;
       transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       color: var(--text-muted);
     }
 
     .search-input {
       width: 100%;
-      background: var(--bg-surface);
+      background: #0e1117;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 5px 10px 5px 30px;
+      border-radius: 4px;
+      padding: 5px 10px 5px 28px;
       color: var(--text-primary);
-      font-size: 0.8rem;
+      font-size: 12px;
     }
 
     .search-input:focus {
@@ -1172,64 +1222,64 @@
       width: 100%;
       overflow-x: auto;
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+      background: #0e1117;
     }
 
     .leaderboard-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.825rem;
+      font-size: 12px;
       text-align: left;
     }
 
     .leaderboard-table th {
-      padding: 9px 12px;
-      font-size: 0.7rem;
-      font-weight: 700;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-muted);
-      background: #10131d;
+      background: #11141c;
       border-bottom: 1px solid var(--border-subtle);
       white-space: nowrap;
     }
 
     .leaderboard-table td {
-      padding: 9px 12px;
-      border-bottom: 1px solid rgba(33, 38, 54, 0.6);
+      padding: 8px 12px;
+      border-bottom: 1px solid #161a23;
       vertical-align: middle;
     }
 
     .leaderboard-table tr:hover td {
-      background: rgba(255, 255, 255, 0.015);
+      background: #151922;
     }
 
     .rank-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 4px;
-      font-size: 0.725rem;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 600;
       font-family: var(--font-mono);
     }
 
-    .rank-badge.rank-1 { background: #f59e0b; color: #000000; }
-    .rank-badge.rank-2 { background: #94a3b8; color: #000000; }
-    .rank-badge.rank-3 { background: #b45309; color: #ffffff; }
-    .rank-badge.rank-other { background: #1a1e2b; color: var(--text-muted); border: 1px solid var(--border-subtle); }
+    .rank-badge.rank-1 { background: #2e2008; border: 1px solid #785311; color: #fbbf24; }
+    .rank-badge.rank-2 { background: #1c2230; border: 1px solid #3b455b; color: #cbd5e1; }
+    .rank-badge.rank-3 { background: #26160c; border: 1px solid #6b3512; color: #fb923c; }
+    .rank-badge.rank-other { background: #161922; color: var(--text-muted); border: 1px solid var(--border-subtle); }
 
     .xp-badge {
       display: inline-block;
-      font-weight: 700;
+      font-weight: 600;
       font-family: var(--font-mono);
-      font-size: 0.875rem;
+      font-size: 12px;
       color: #34d399;
-      background: var(--accent-emerald-subtle);
-      border: 1px solid var(--accent-emerald-border);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
       padding: 2px 7px;
       border-radius: 4px;
     }
@@ -1238,7 +1288,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
@@ -1258,16 +1308,16 @@
     .modal-dialog {
       background: var(--bg-card);
       border: 1px solid var(--border-medium);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       width: 100%;
       max-width: 520px;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
       overflow: hidden;
     }
 
     .modal-header {
-      padding: 13px 18px;
-      background: var(--bg-surface);
+      padding: 12px 18px;
+      background: #0e1117;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
@@ -1275,8 +1325,8 @@
     }
 
     .modal-title {
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-primary);
     }
 
@@ -1290,10 +1340,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.15s ease;
     }
 
     .modal-close:hover {
       color: var(--text-primary);
+      background: #181c25;
     }
 
     .modal-body {
@@ -1306,24 +1358,25 @@
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
 
     .form-label {
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       color: var(--text-secondary);
     }
 
     .form-input {
       background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      border: 1px solid #212735;
+      border-radius: var(--radius-md);
       color: var(--text-primary);
       padding: 7px 10px;
-      font-size: 0.85rem;
+      font-size: 13px;
+      transition: border-color 0.15s ease;
     }
 
     .form-input:focus {
@@ -1334,7 +1387,7 @@
     .modal-footer {
       padding: 12px 18px;
       border-top: 1px solid var(--border-subtle);
-      background: var(--bg-surface);
+      background: #0e1117;
       display: flex;
       align-items: center;
       justify-content: flex-end;
@@ -1354,20 +1407,20 @@
     }
 
     .toast {
-      background: #171b26;
+      background: #161922;
       border: 1px solid var(--border-medium);
       color: var(--text-primary);
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
       pointer-events: auto;
-      animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      max-width: 360px;
+      animation: toastSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      max-width: 340px;
     }
 
     .toast.success { border-left: 3px solid var(--accent-emerald); }
@@ -1375,7 +1428,7 @@
     .toast.info { border-left: 3px solid var(--accent-blue); }
 
     @keyframes toastSlide {
-      from { transform: translateY(16px); opacity: 0; }
+      from { transform: translateY(12px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
 
@@ -1383,7 +1436,7 @@
       border-top: 1px solid var(--border-subtle);
       padding: 14px 24px;
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 30px;
       background: var(--bg-canvas);
@@ -1397,55 +1450,60 @@
     <div class="navbar-inner">
       <div class="brand-group">
         <div class="brand-crest">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2zm-8.2 8.77l8.2 3.73 8.2-3.73v4.46l-8.2 3.73-8.2-3.73v-4.46zM12 21.36l-7.2-3.27v-2.36l7.2 3.27 7.2-3.27v2.36L12 21.36z"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
           </svg>
         </div>
-        <div class="brand-info">
-          <div class="brand-title-row">
-            <span class="brand-title">Winslow Accord Ops</span>
-            <div class="clan-status-pill" id="openSettingsBtn" title="Click to edit Clan settings">
-              <span id="navClanName">Winslow Accord</span>
-              <span style="opacity: 0.6;">(ID: <span id="navClanId">825966682</span>)</span>
-              <span>⚙️</span>
-            </div>
-            <div class="sync-status-pill" id="cloudSyncPill" title="Server Discord ID Cloud Synchronization">
-              <span class="sync-dot"></span>
-              <span id="cloudSyncText">Cloud Sync: Connected</span>
-            </div>
-          </div>
-          <span class="brand-subtitle">Event Attendance &amp; Clan Labs Slash Command Generator</span>
+        <div class="brand-breadcrumb">
+          <span class="brand-org">Winslow Accord</span>
+          <span class="brand-divider">/</span>
+          <span class="brand-app">Events</span>
+        </div>
+        <div class="clan-status-pill" id="openSettingsBtn" title="Clan settings">
+          <span id="navClanName">Winslow Accord</span>
+          <span class="clan-id-tag">(ID: <span id="navClanId">825966682</span>)</span>
+          <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div class="sync-status-pill" id="cloudSyncPill" title="Server Discord ID cloud synchronization">
+          <span class="sync-dot"></span>
+          <span id="cloudSyncText">Cloud Sync: Connected</span>
         </div>
       </div>
 
       <!-- Quick Stats in Navbar -->
       <div class="navbar-stats">
         <div class="nav-stat-item">
-          <span>Events:</span>
+          <span>Events</span>
           <span class="nav-stat-value" id="navStatEvents">0</span>
         </div>
+        <div class="nav-stat-divider"></div>
         <div class="nav-stat-item">
-          <span>Players:</span>
+          <span>Players</span>
           <span class="nav-stat-value" id="navStatPlayers">0</span>
         </div>
+        <div class="nav-stat-divider"></div>
         <div class="nav-stat-item">
-          <span>Total XP:</span>
+          <span>Total XP</span>
           <span class="nav-stat-value" id="navStatTotalXP">0</span>
         </div>
       </div>
 
       <!-- Controls -->
       <div class="navbar-actions">
-        <div class="xp-pill-box" title="XP awarded per verified clan attendee for a WIN">
-          <span class="xp-pill-label win">Win:</span>
+        <div class="xp-pill-box" title="XP awarded per attendee for a Win">
+          <span class="xp-pill-label win">Win</span>
           <input type="number" id="globalWinXP" class="xp-pill-input" value="10" min="0" max="1000">
         </div>
-        <div class="xp-pill-box" title="XP awarded per verified clan attendee for a LOSS">
-          <span class="xp-pill-label loss">Loss:</span>
+        <div class="xp-pill-box" title="XP awarded per attendee for a Loss">
+          <span class="xp-pill-label loss">Loss</span>
           <input type="number" id="globalLossXP" class="xp-pill-input" value="5" min="0" max="1000">
         </div>
         <button id="resetAllBtn" class="btn btn-secondary btn-sm" title="Clear all staged files and events">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
           Reset
         </button>
       </div>
@@ -1460,27 +1518,28 @@
       <div class="card-header">
         <div class="card-title-group">
           <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-            Screenshot Ingestion &amp; Optical Transcription
+            Match Screenshots
           </div>
         </div>
-        <span class="card-subtitle">Powered by Gemini Vision &amp; Roblox Clan Group Verifier</span>
+        <span class="card-subtitle">Upload match scoreboards to extract rosters and calculate Clan Labs XP</span>
       </div>
       <div class="card-body">
         <div class="dropzone-container" id="uploadDropZone">
           <input type="file" id="filePicker" class="file-input-hidden" multiple accept=".png,.jpg,.jpeg,image/*">
-          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-3zm4.41-6.59L11 5.83V16h2V5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41z"/>
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <div class="dropzone-title">Drag &amp; drop Roblox match screenshots or browse files</div>
-          <div class="dropzone-hint">Supports PNG, JPG, or JPEG • Batch upload supported</div>
+          <div class="dropzone-title">Drop match screenshots here or browse</div>
+          <div class="dropzone-hint">PNG, JPG up to 10MB</div>
         </div>
 
         <!-- Staged files grid -->
         <div id="stagedFilesContainer" class="staged-files-wrap" style="display: none;">
           <div class="staged-files-header">
             <span>Staged Screenshots (<span id="stagedCount">0</span>)</span>
-            <button id="clearStagedBtn" class="btn-danger-ghost btn-sm">Clear Staged</button>
+            <button id="clearStagedBtn" class="btn-danger-ghost btn-sm">Clear</button>
           </div>
           <div class="staged-grid" id="stagedFilesGrid"></div>
         </div>
@@ -1491,8 +1550,7 @@
             <span>Upload screenshots to extract match scores, player stats, and clan verification.</span>
           </div>
           <button id="extractBtn" class="btn btn-primary" disabled>
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-            <span>Extract &amp; Match Roster</span>
+            <span>Extract Rosters</span>
           </button>
         </div>
       </div>
@@ -1503,11 +1561,10 @@
       <div class="card-header">
         <div class="card-title-group">
           <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-            Processed Matches &amp; Events (<span id="eventsCountBadge">0</span>)
+            Matches (<span id="eventsCountBadge">0</span>)
           </div>
         </div>
-        <span class="card-subtitle">Set WIN / LOSS status, select your clan team, and copy Clan Labs slash command</span>
+        <span class="card-subtitle">Review team rosters, set match outcome, and copy Clan Labs command</span>
       </div>
       <div class="card-body">
         <div class="events-stack" id="eventsContainer">
@@ -1521,22 +1578,21 @@
       <div class="card-header">
         <div class="card-title-group">
           <div class="card-title">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
-            Session XP Leaderboard &amp; Export Center
+            Attendance &amp; XP Leaderboard
           </div>
         </div>
         <div class="navbar-actions">
-          <button id="openBatchCommandsBtn" class="btn btn-copy btn-sm" title="Generate Clan Labs commands grouped by XP">
-            ⚡ Batch Clan Labs Commands
+          <button id="openBatchCommandsBtn" class="btn btn-secondary btn-sm" title="Generate Clan Labs commands grouped by XP">
+            Batch Commands
           </button>
           <button id="copyDiscordBtn" class="btn btn-secondary btn-sm" title="Copy clean Discord formatted attendance list">
-            📋 Copy Discord Roster
+            Copy Discord List
           </button>
           <button id="copyMarkdownBtn" class="btn btn-secondary btn-sm" title="Copy markdown formatted table">
-            📋 Copy Markdown
+            Copy Markdown
           </button>
           <button id="exportCsvBtn" class="btn btn-secondary btn-sm" title="Download spreadsheet CSV">
-            📥 Export CSV
+            Export CSV
           </button>
         </div>
       </div>
@@ -1560,11 +1616,14 @@
         <!-- Leaderboard Search & Table -->
         <div class="leaderboard-toolbar">
           <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            <input type="text" id="leaderboardSearchInput" class="search-input" placeholder="Search player, Discord ID, or rank...">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="leaderboardSearchInput" class="search-input" placeholder="Search player, Discord ID, or role...">
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">
-            Ordered by Total XP (descending) &bull; Verified attendance records
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Ordered by Total XP &bull; Verified clan attendance
           </div>
         </div>
 
@@ -1572,14 +1631,14 @@
           <table class="leaderboard-table">
             <thead>
               <tr>
-                <th style="width: 50px;">Rank</th>
-                <th>Roblox Player</th>
+                <th style="width: 44px;">Rank</th>
+                <th>Player</th>
                 <th>Discord ID</th>
                 <th>Clan Role</th>
                 <th style="text-align: center;">Events</th>
                 <th style="text-align: center;">Wins</th>
                 <th style="text-align: center;">Losses</th>
-                <th style="text-align: center;">Total Kills</th>
+                <th style="text-align: center;">Kills</th>
                 <th style="text-align: right;">Total XP</th>
               </tr>
             </thead>
@@ -1597,8 +1656,13 @@
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <div class="modal-title">⚙️ Clan Verification &amp; XP Engine Settings</div>
-        <button class="modal-close" id="closeSettingsBtn">✕</button>
+        <div class="modal-title">Clan Settings</div>
+        <button class="modal-close" id="closeSettingsBtn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -1608,7 +1672,7 @@
         <div class="form-group">
           <label class="form-label" for="settingsClanGroupId">Roblox Group ID</label>
           <input type="number" id="settingsClanGroupId" class="form-input" value="825966682">
-          <span style="font-size: 0.725rem; color: var(--text-muted);">Used to fetch group member roles and identify official clan rosters.</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Used to verify group membership and fetch clan roles.</span>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div class="form-group">
@@ -1620,25 +1684,25 @@
             <input type="number" id="settingsLossXP" class="form-input" value="5">
           </div>
         </div>
-        <div class="form-group" style="padding-top: 6px; border-top: 1px solid var(--border-subtle);">
+        <div class="form-group" style="padding-top: 12px; border-top: 1px solid var(--border-subtle);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <label class="form-label">Discord ID Cloud &amp; Local Cache</label>
+            <label class="form-label">Discord ID Storage</label>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span id="discordIdCacheCount" style="font-size: 0.725rem; color: var(--text-muted); font-family: var(--font-mono);">0 cached</span>
+              <span id="discordIdCacheCount" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">0 cached</span>
               <div class="sync-status-pill" id="modalCloudSyncPill">
                 <span class="sync-dot"></span>
                 <span id="modalCloudSyncText">Cloud Sync: Connected</span>
               </div>
             </div>
           </div>
-          <button id="clearDiscordCacheBtn" class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 4px;">
-            Clear Stored Discord IDs
+          <button id="clearDiscordCacheBtn" class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 6px;">
+            Clear Stored IDs
           </button>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary btn-sm" id="cancelSettingsBtn">Cancel</button>
-        <button class="btn btn-primary btn-sm" id="saveSettingsBtn">Save &amp; Apply</button>
+        <button class="btn btn-primary btn-sm" id="saveSettingsBtn">Save Changes</button>
       </div>
     </div>
   </div>
@@ -1647,14 +1711,19 @@
   <div class="modal-backdrop" id="batchCommandsModal">
     <div class="modal-dialog" style="max-width: 620px;">
       <div class="modal-header">
-        <div class="modal-title">⚡ Session Clan Labs Slash Commands</div>
-        <button class="modal-close" id="closeBatchCommandsBtn">✕</button>
+        <div class="modal-title">Batch Clan Labs Commands</div>
+        <button class="modal-close" id="closeBatchCommandsBtn" title="Close">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <div class="modal-body">
-        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+        <div style="font-size: 12px; color: var(--text-secondary);">
           Commands grouped by total XP awarded. Run these in your Clan Labs bot Discord channel:
         </div>
-        <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 480px; overflow-y: auto; padding-right: 4px;">
+        <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 4px;">
           <!-- Dynamically populated commands -->
         </div>
       </div>
@@ -1670,7 +1739,7 @@
 
   <!-- Footer -->
   <footer>
-    Winslow Accord Ops &bull; Modern Roblox Clan Event Ingestion, OCR Verification &amp; Clan Labs Command Tool
+    Winslow Accord &bull; Clan Event Attendance &bull; Clan Labs XP Engine
   </footer>
 
   <!-- Frontend Logic -->
@@ -1690,7 +1759,7 @@
         events: [],
         calculatedXPResult: null,
         playerRoles: {},      // username.toLowerCase() -> clan_role
-        discordIds: {},       // username.toLowerCase() -> discord_id (persisted in localStorage)
+        discordIds: {},       // username.toLowerCase() -> discord_id (persisted in localStorage & server)
       };
 
       const STORAGE_KEY_DISCORD_IDS = "roblox_clan_discord_ids_v1";
@@ -1939,11 +2008,14 @@
       function showToast(message, type = "info", duration = 3500) {
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
-        let icon = "ℹ️";
-        if (type === "success") icon = "✓";
-        if (type === "error") icon = "✕";
+        let iconSvg = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+        if (type === "success") {
+          iconSvg = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (type === "error") {
+          iconSvg = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+        }
 
-        toast.innerHTML = `<span style="font-weight:700;">${icon}</span><span>${escapeHtml(message)}</span>`;
+        toast.innerHTML = `${iconSvg}<span>${escapeHtml(message)}</span>`;
         els.toastContainer.appendChild(toast);
 
         setTimeout(() => {
@@ -2057,7 +2129,10 @@
                 <div class="file-chip-size">${sizeStr}</div>
               </div>
               <button class="file-chip-remove" title="Remove" data-idx="${idx}">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             `;
 
@@ -2124,11 +2199,11 @@
         els.extractBtn.disabled = true;
         els.extractBtn.innerHTML = `
           <div class="spinner"></div>
-          <span>Transcribing &amp; Matching...</span>
+          <span>Extracting...</span>
         `;
         els.extractStatusText.innerHTML = `
-          <div class="spinner blue"></div>
-          <span>Transcribing screenshot via Gemini Vision and querying Roblox group members...</span>
+          <div class="spinner"></div>
+          <span>Extracting rosters and verifying clan membership...</span>
         `;
 
         try {
@@ -2190,7 +2265,7 @@
             });
           });
 
-          showToast(`Successfully processed ${extractedEvents.length} event(s)!`, "success");
+          showToast(`Successfully processed ${extractedEvents.length} event(s)`, "success");
           state.stagedFiles = [];
           renderStagedFiles();
           renderEvents();
@@ -2202,8 +2277,7 @@
         } finally {
           els.extractBtn.disabled = state.stagedFiles.length === 0;
           els.extractBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-            <span>Extract &amp; Match Roster</span>
+            <span>Extract Rosters</span>
           `;
         }
       }
@@ -2256,12 +2330,8 @@
           const winLossSegmented = document.createElement("div");
           winLossSegmented.className = "win-loss-segmented";
           winLossSegmented.innerHTML = `
-            <div class="segmented-btn win ${evt.isWin ? 'active' : ''}">
-              <span>🏆 WIN (+${state.config.win_xp} XP)</span>
-            </div>
-            <div class="segmented-btn loss ${!evt.isWin ? 'active' : ''}">
-              <span>💀 LOSS (+${state.config.loss_xp} XP)</span>
-            </div>
+            <button type="button" class="segmented-btn win ${evt.isWin ? 'active' : ''}">Win</button>
+            <button type="button" class="segmented-btn loss ${!evt.isWin ? 'active' : ''}">Loss</button>
           `;
 
           winLossSegmented.querySelector(".win").addEventListener("click", () => {
@@ -2282,9 +2352,12 @@
 
           const deleteEventBtn = document.createElement("button");
           deleteEventBtn.className = "btn-danger-ghost btn-sm";
-          deleteEventBtn.title = "Delete this match event";
+          deleteEventBtn.title = "Delete match event";
           deleteEventBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
           `;
           deleteEventBtn.addEventListener("click", () => {
             state.events.splice(evtIndex, 1);
@@ -2339,7 +2412,7 @@
 
           if (players.length === 0) {
             rosterWrap.innerHTML = `
-              <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+              <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
                 No players detected in this team. Use the form below to manually add players.
               </div>
             `;
@@ -2352,15 +2425,15 @@
             table.innerHTML = `
               <thead>
                 <tr>
-                  <th>Player Username</th>
-                  <th>Verification</th>
-                  <th>Clan Role</th>
-                  <th>Discord ID / Snowflake</th>
+                  <th>Player</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Discord ID</th>
                   <th style="text-align: center;">Kills</th>
                   <th style="text-align: center;">Damage</th>
                   <th style="text-align: center;">Heals</th>
                   <th style="text-align: center;">Caps</th>
-                  <th style="width: 36px;"></th>
+                  <th style="width: 32px;"></th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -2390,10 +2463,10 @@
                 : `<div class="status-dot-wrap"><span class="status-dot unverified"></span><span style="color:#fbbf24;">Unverified</span></div>`;
 
               // Role chip
-              let roleName = "Guest / Non-Clan";
+              let roleName = "Guest";
               let roleClass = "guest";
               if (player.in_clan) {
-                roleName = player.clan_role || "Clan Member";
+                roleName = player.clan_role || "Member";
                 const rl = roleName.toLowerCase();
                 if (rl.includes("marshal") || rl.includes("commander") || rl.includes("leader")) {
                   roleClass = "officer";
@@ -2436,7 +2509,7 @@
                       placeholder="e.g. 289456182901234567"
                       value="${escapeHtml(currentDiscordId)}"
                       data-username="${escapeHtml(verifiedName)}"
-                      title="Paste Discord User ID or @mention (persists automatically)">
+                      title="Paste Discord User ID or @mention">
                   </div>
                 </td>
                 <td style="text-align: center;"><span class="stat-num">${player.kills || 0}</span></td>
@@ -2445,7 +2518,10 @@
                 <td style="text-align: center;"><span class="stat-num">${player.caps || 0}</span></td>
                 <td style="text-align: right;">
                   <button class="btn-danger-ghost btn-sm remove-player-btn" data-pidx="${pIdx}" title="Remove player from event">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
                   </button>
                 </td>
               `;
@@ -2480,7 +2556,7 @@
           const addPlayerBar = document.createElement("div");
           addPlayerBar.className = "add-player-row";
           addPlayerBar.innerHTML = `
-            <span style="font-size: 0.725rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">+ Add Player:</span>
+            <span class="add-player-label">+ Add Player:</span>
             <input type="text" class="add-player-input" placeholder="Roblox Username">
             <input type="number" class="stat-input-mini" placeholder="Kills" value="0" min="0" title="Kills">
             <input type="number" class="stat-input-mini" placeholder="Dmg" value="0" min="0" title="Damage">
@@ -2614,17 +2690,17 @@
         const header = document.createElement("div");
         header.className = "clan-labs-header";
         header.innerHTML = `
-          <div class="clan-labs-title">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            Clan Labs Slash Command (Match XP)
+          <div class="clan-labs-title-wrap">
+            <span class="clan-labs-title">Clan Labs Slash Command</span>
+            <span class="clan-labs-badge">${validUsers.length} Attendee${validUsers.length === 1 ? '' : 's'}</span>
           </div>
-          <button class="btn btn-copy btn-sm copy-cmd-btn" title="Copy slash command for Discord">
-            ⚡ Copy Slash Command
+          <button class="btn btn-secondary btn-sm copy-cmd-btn" title="Copy command for Discord">
+            Copy Command
           </button>
         `;
 
         header.querySelector(".copy-cmd-btn").addEventListener("click", () => {
-          copyToClipboard(rawCommand, "⚡ Clan Labs slash command copied to clipboard!");
+          copyToClipboard(rawCommand, "Clan Labs slash command copied to clipboard");
         });
 
         const codeBox = document.createElement("div");
@@ -2639,11 +2715,12 @@
           const alert = document.createElement("div");
           alert.className = "clan-labs-missing-alert";
           alert.innerHTML = `
-            <span>⚠️ ${missingUsers.length} player(s) missing Discord ID:</span>
+            <span>Missing Discord ID (${missingUsers.length}):</span>
           `;
 
           missingUsers.forEach((m) => {
             const jumpBtn = document.createElement("button");
+            jumpBtn.type = "button";
             jumpBtn.className = "missing-player-jump";
             jumpBtn.textContent = `@${m.name}`;
             jumpBtn.title = "Click to jump and enter Discord ID";
@@ -2782,7 +2859,7 @@
         if (!leaderboard || leaderboard.length === 0) {
           els.leaderboardTableBody.innerHTML = `
             <tr>
-              <td colspan="9" style="padding: 32px; text-align: center; color: var(--text-muted);">
+              <td colspan="9" style="padding: 24px; text-align: center; color: var(--text-muted);">
                 No leaderboard records found. Ensure matches have players on the selected clan team.
               </td>
             </tr>
@@ -2799,7 +2876,7 @@
           else if (rank === 2) rankClass = "rank-2";
           else if (rank === 3) rankClass = "rank-3";
 
-          const roleName = state.playerRoles[p.username.toLowerCase()] || "Clan Member";
+          const roleName = state.playerRoles[p.username.toLowerCase()] || "Member";
           let roleClass = "member";
           const rl = roleName.toLowerCase();
           if (rl.includes("marshal") || rl.includes("commander") || rl.includes("leader")) roleClass = "officer";
@@ -2807,8 +2884,8 @@
 
           const dId = state.discordIds[p.username.toLowerCase()] || "";
           const discordDisplay = dId
-            ? `<span style="font-family:var(--font-mono); font-size:0.75rem; color:#93c5fd;">&lt;@${escapeHtml(dId)}&gt;</span>`
-            : `<span style="font-size:0.7rem; color:var(--text-muted); font-style:italic;">No ID mapped</span>`;
+            ? `<span style="font-family:var(--font-mono); font-size:12px; color:#93c5fd;">&lt;@${escapeHtml(dId)}&gt;</span>`
+            : `<span style="font-size:11px; color:var(--text-muted); font-style:italic;">No ID mapped</span>`;
 
           const avatarLetter = (p.username[0] || "?").toUpperCase();
 
@@ -2817,7 +2894,7 @@
             <td>
               <div class="player-cell">
                 <div class="player-avatar">${escapeHtml(avatarLetter)}</div>
-                <span style="font-weight:700; color:var(--text-primary);">${escapeHtml(p.username)}</span>
+                <span style="font-weight:600; color:var(--text-primary);">${escapeHtml(p.username)}</span>
               </div>
             </td>
             <td>${discordDisplay}</td>
@@ -2828,8 +2905,8 @@
               </div>
             </td>
             <td style="text-align: center; font-family:var(--font-mono);">${(p.events_attended || []).length}</td>
-            <td style="text-align: center; color: var(--accent-emerald); font-weight:700; font-family:var(--font-mono);">${p.wins || 0}</td>
-            <td style="text-align: center; color: var(--accent-red); font-weight:700; font-family:var(--font-mono);">${p.losses || 0}</td>
+            <td style="text-align: center; color: var(--accent-emerald); font-weight:600; font-family:var(--font-mono);">${p.wins || 0}</td>
+            <td style="text-align: center; color: var(--accent-red); font-weight:600; font-family:var(--font-mono);">${p.losses || 0}</td>
             <td style="text-align: center; font-family:var(--font-mono);">${p.total_kills || 0}</td>
             <td style="text-align: right;"><span class="xp-badge">${p.total_xp || 0} XP</span></td>
           `;
@@ -2884,14 +2961,15 @@
             const header = document.createElement("div");
             header.className = "clan-labs-header";
             header.innerHTML = `
-              <span style="font-weight:700; font-size:0.75rem; color:#bfdbfe;">
-                ${list.length} Attendees &bull; ${amt} XP Each
-              </span>
-              <button class="btn btn-copy btn-sm copy-single-batch-btn">Copy Command</button>
+              <div class="clan-labs-title-wrap">
+                <span class="clan-labs-title">${amt} XP Group</span>
+                <span class="clan-labs-badge">${list.length} Attendee${list.length === 1 ? '' : 's'}</span>
+              </div>
+              <button class="btn btn-secondary btn-sm copy-single-batch-btn">Copy Command</button>
             `;
 
             header.querySelector(".copy-single-batch-btn").addEventListener("click", () => {
-              copyToClipboard(cmdText, `⚡ Copied command for ${amt} XP group!`);
+              copyToClipboard(cmdText, `Copied command for ${amt} XP group`);
             });
 
             const codeBox = document.createElement("div");
@@ -2919,7 +2997,7 @@
           showToast("No commands to copy", "error");
           return;
         }
-        copyToClipboard(allCmds.join("\n\n"), "⚡ All Clan Labs commands copied to clipboard!");
+        copyToClipboard(allCmds.join("\n\n"), "All Clan Labs commands copied to clipboard");
       });
 
       // Standard Exports
@@ -2939,7 +3017,7 @@
           out += `${idx + 1}. **${p.username}**${discordMention} [${role}] — **${p.total_xp} XP** (${(p.events_attended || []).length} Matches, ${p.total_kills || 0} Kills)\n`;
         });
 
-        copyToClipboard(out, "📋 Discord attendance roster copied to clipboard!");
+        copyToClipboard(out, "Discord attendance roster copied to clipboard");
       });
 
       els.copyMarkdownBtn.addEventListener("click", () => {
@@ -2958,7 +3036,7 @@
           md += `| ${idx + 1} | **${p.username}** | ${mention} | ${role} | ${(p.events_attended || []).length} | ${p.wins || 0} | ${p.losses || 0} | ${p.total_kills || 0} | **${p.total_xp || 0} XP** |\n`;
         });
 
-        copyToClipboard(md, "📋 Markdown table copied to clipboard!");
+        copyToClipboard(md, "Markdown table copied to clipboard");
       });
 
       els.exportCsvBtn.addEventListener("click", () => {
@@ -2977,7 +3055,7 @@
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        showToast("📥 Exported clan_events_xp.csv", "success");
+        showToast("Exported clan_events_xp.csv", "success");
       });
 
       function copyToClipboard(text, successMsg) {
