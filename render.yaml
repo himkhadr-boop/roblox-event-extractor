@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: winslow-event-extractor
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GEMINI_API_KEYS
+        sync: false
+      - key: DEFAULT_CLAN_NAME
+        value: Winslow Accord
+      - key: DEFAULT_CLAN_GROUP_ID
+        value: "825966682"
+      - key: WIN_XP
+        value: "10"
+      - key: LOSS_XP
+        value: "5"

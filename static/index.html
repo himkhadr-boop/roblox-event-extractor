@@ -1,0 +1,2882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Winslow Accord Ops — Event Attendance & XP Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Dark slate matte color scheme (Linear / Discord / Steam aesthetic) */
+      --bg-canvas: #0c0e14;
+      --bg-surface: #12151e;
+      --bg-surface-elevated: #181c27;
+      --bg-surface-active: #1f2433;
+      --bg-card: #151823;
+      --bg-codebox: #0a0c12;
+      --bg-input: #0f121b;
+      
+      --border-subtle: #212636;
+      --border-medium: #2a3145;
+      --border-focus: #3b82f6;
+
+      --text-primary: #f3f4f6;
+      --text-secondary: #9aa5b8;
+      --text-muted: #626e85;
+      --text-inverse: #0c0e14;
+
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-blurple: #5865f2;
+
+      --accent-emerald: #10b981;
+      --accent-emerald-subtle: rgba(16, 185, 129, 0.12);
+      --accent-emerald-border: rgba(16, 185, 129, 0.35);
+
+      --accent-red: #ef4444;
+      --accent-red-subtle: rgba(239, 68, 68, 0.12);
+      --accent-red-border: rgba(239, 68, 68, 0.35);
+
+      --accent-amber: #f59e0b;
+      --accent-amber-subtle: rgba(245, 158, 11, 0.12);
+      --accent-amber-border: rgba(245, 158, 11, 0.35);
+
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+      --radius-sm: 5px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-surface: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-canvas);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-medium);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3a445f;
+    }
+
+    /* Top Navigation Bar */
+    header.navbar {
+      background: rgba(12, 14, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 12px 24px;
+    }
+
+    .navbar-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-crest {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: #181d2a;
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .brand-crest svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .clan-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .clan-status-pill:hover {
+      border-color: var(--border-medium);
+      color: var(--text-primary);
+      background: var(--bg-surface-active);
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .navbar-stats {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 14px;
+      border-radius: var(--radius-md);
+    }
+
+    .nav-stat-item {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-stat-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .xp-pill-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 3px 6px;
+      gap: 4px;
+    }
+
+    .xp-pill-label {
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .xp-pill-label.win { color: var(--accent-emerald); }
+    .xp-pill-label.loss { color: var(--accent-red); }
+
+    .xp-pill-input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      font-family: var(--font-mono);
+    }
+
+    /* Standard Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 7px 13px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      font-family: var(--font-sans);
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #3b82f6;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1d4ed8;
+      border-color: #2563eb;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-surface-active);
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+    }
+
+    .btn-copy {
+      background: #1a2030;
+      border: 1px solid #2f3852;
+      color: #dbeafe;
+    }
+
+    .btn-copy:hover {
+      background: #222b42;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+
+    .btn-danger-ghost {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 5px 8px;
+    }
+
+    .btn-danger-ghost:hover {
+      color: var(--accent-red);
+      background: var(--accent-red-subtle);
+      border-color: var(--accent-red-border);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.775rem;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Cards & Panels */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-surface);
+    }
+
+    .card-header {
+      padding: 13px 18px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-blue);
+    }
+
+    .card-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .card-body {
+      padding: 18px;
+    }
+
+    /* Minimalist File Dropzone */
+    .dropzone-container {
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .dropzone-container:hover,
+    .dropzone-container.dragover {
+      border-color: var(--accent-blue);
+      background: #141926;
+    }
+
+    .dropzone-icon {
+      width: 36px;
+      height: 36px;
+      color: var(--text-secondary);
+      margin: 0 auto 10px;
+    }
+
+    .dropzone-container:hover .dropzone-icon {
+      color: var(--accent-blue);
+    }
+
+    .dropzone-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .dropzone-hint {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+    }
+
+    .file-input-hidden {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Staged Files Preview */
+    .staged-files-wrap {
+      margin-top: 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+
+    .staged-files-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .staged-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .file-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .file-chip-thumb {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      background: #181d2a;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .file-chip-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-chip-name {
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-chip-size {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .file-chip-remove {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 3px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .file-chip-remove:hover {
+      color: var(--accent-red);
+      background: var(--accent-red-subtle);
+    }
+
+    /* Extract Action Bar */
+    .extract-bar {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .extract-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    .spinner.blue {
+      border-color: rgba(59, 130, 246, 0.2);
+      border-top-color: var(--accent-blue);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Events List & Event Card */
+    .events-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .event-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .event-header {
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .event-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .event-num-badge {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      font-size: 0.725rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .event-title-input {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 3px 6px;
+      width: 100%;
+      max-width: 360px;
+      transition: all 0.15s ease;
+    }
+
+    .event-title-input:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-surface-elevated);
+    }
+
+    .event-title-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: var(--bg-input);
+    }
+
+    .event-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Crisp Segmented Pill Toggle for Win/Loss */
+    .win-loss-segmented {
+      display: inline-flex;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      gap: 2px;
+      user-select: none;
+    }
+
+    .segmented-btn {
+      padding: 4px 11px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .segmented-btn.active.win {
+      background: var(--accent-emerald-subtle);
+      border-color: var(--accent-emerald-border);
+      color: #34d399;
+    }
+
+    .segmented-btn.active.loss {
+      background: var(--accent-red-subtle);
+      border-color: var(--accent-red-border);
+      color: #f87171;
+    }
+
+    .segmented-btn:not(.active):hover {
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Team Tabs Selector */
+    .team-tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--bg-surface-elevated);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+    }
+
+    .team-tab-label {
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .team-tab {
+      padding: 4px 10px;
+      font-size: 0.775rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .team-tab:hover {
+      border-color: var(--border-medium);
+      color: var(--text-primary);
+    }
+
+    .team-tab.active {
+      background: #1e2638;
+      border-color: var(--accent-blue);
+      color: #bfdbfe;
+      font-weight: 700;
+    }
+
+    .team-clan-chip {
+      font-size: 0.675rem;
+      padding: 1px 5px;
+      background: var(--accent-emerald-subtle);
+      border: 1px solid var(--accent-emerald-border);
+      color: #34d399;
+      border-radius: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* High-Density Roster Table */
+    .roster-wrap {
+      padding: 14px 16px;
+    }
+
+    .roster-table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.825rem;
+      text-align: left;
+    }
+
+    .roster-table th {
+      padding: 7px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+
+    .roster-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(33, 38, 54, 0.7);
+      vertical-align: middle;
+    }
+
+    .roster-table tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    /* Player cell */
+    .player-cell {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .player-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #1b202e;
+      border: 1px solid var(--border-medium);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #cbd5e1;
+      font-weight: 700;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+
+    .player-name-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .player-name-text {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .disambig-tag {
+      font-size: 0.675rem;
+      color: var(--accent-amber);
+      font-family: var(--font-mono);
+      opacity: 0.9;
+    }
+
+    /* Status indicator */
+    .status-dot-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.725rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.verified {
+      background-color: var(--accent-emerald);
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.6);
+    }
+
+    .status-dot.unverified {
+      background-color: var(--accent-amber);
+    }
+
+    /* Discord-Style Role Chip */
+    .role-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #161a25;
+      border: 1px solid #23293a;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .role-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .role-dot.officer { background-color: #f59e0b; }
+    .role-dot.captain { background-color: #3b82f6; }
+    .role-dot.member { background-color: #10b981; }
+    .role-dot.private { background-color: #94a3b8; }
+    .role-dot.guest { background-color: #475569; }
+
+    /* Inline Discord ID Input */
+    .discord-id-cell-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .discord-id-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 4px 7px;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      width: 170px;
+      transition: all 0.15s ease;
+    }
+
+    .discord-id-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: #141926;
+    }
+
+    .discord-id-input.missing {
+      border-color: var(--accent-amber-border);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .discord-id-input.pulse-highlight {
+      animation: pulseHighlight 1.5s ease;
+    }
+
+    @keyframes pulseHighlight {
+      0% { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+      50% { border-color: #3b82f6; box-shadow: 0 0 14px rgba(59, 130, 246, 0.8); }
+      100% { border-color: var(--border-subtle); box-shadow: none; }
+    }
+
+    .stat-num {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      text-align: center;
+    }
+
+    /* Clan Labs Slash Command Box */
+    .clan-labs-section {
+      margin-top: 14px;
+      background: var(--bg-codebox);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .clan-labs-header {
+      padding: 8px 12px;
+      background: #0f121a;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .clan-labs-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.775rem;
+      font-weight: 700;
+      color: #93c5fd;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .clan-labs-codebox {
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-break: break-all;
+      user-select: all;
+      line-height: 1.6;
+      background: #07090e;
+    }
+
+    .clan-labs-codebox .cmd-root { color: #60a5fa; font-weight: 700; }
+    .clan-labs-codebox .cmd-param { color: #c084fc; }
+    .clan-labs-codebox .cmd-id { color: #93c5fd; }
+    .clan-labs-codebox .cmd-missing { color: #f87171; background: rgba(239, 68, 68, 0.15); padding: 1px 4px; border-radius: 3px; }
+    .clan-labs-codebox .cmd-action { color: #34d399; font-weight: 600; }
+    .clan-labs-codebox .cmd-amount { color: #fbbf24; font-weight: 700; }
+
+    .clan-labs-missing-alert {
+      padding: 6px 12px;
+      background: rgba(245, 158, 11, 0.08);
+      border-top: 1px solid rgba(245, 158, 11, 0.2);
+      font-size: 0.725rem;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .missing-player-jump {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 3px;
+      padding: 1px 6px;
+      cursor: pointer;
+      color: #fde68a;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .missing-player-jump:hover {
+      background: rgba(245, 158, 11, 0.35);
+      color: #ffffff;
+    }
+
+    /* Add Player Bar */
+    .add-player-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-subtle);
+      border-radius: var(--radius-sm);
+      flex-wrap: wrap;
+    }
+
+    .add-player-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .add-player-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .stat-input-mini {
+      width: 58px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      text-align: center;
+      font-family: var(--font-mono);
+    }
+
+    .stat-input-mini:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    /* KPI Summary Cards */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .kpi-title {
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .kpi-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      line-height: 1.2;
+    }
+
+    /* Leaderboard Section Toolbar */
+    .leaderboard-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      position: relative;
+      width: 250px;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px 5px 30px;
+      color: var(--text-primary);
+      font-size: 0.8rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    /* Leaderboard Table */
+    .leaderboard-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.825rem;
+      text-align: left;
+    }
+
+    .leaderboard-table th {
+      padding: 9px 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: #10131d;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+
+    .leaderboard-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(33, 38, 54, 0.6);
+      vertical-align: middle;
+    }
+
+    .leaderboard-table tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      font-size: 0.725rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+
+    .rank-badge.rank-1 { background: #f59e0b; color: #000000; }
+    .rank-badge.rank-2 { background: #94a3b8; color: #000000; }
+    .rank-badge.rank-3 { background: #b45309; color: #ffffff; }
+    .rank-badge.rank-other { background: #1a1e2b; color: var(--text-muted); border: 1px solid var(--border-subtle); }
+
+    .xp-badge {
+      display: inline-block;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: #34d399;
+      background: var(--accent-emerald-subtle);
+      border: 1px solid var(--accent-emerald-border);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 13px 18px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      padding: 7px 10px;
+      font-size: 0.85rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Toast Container */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #171b26;
+      border: 1px solid var(--border-medium);
+      color: var(--text-primary);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      pointer-events: auto;
+      animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      max-width: 360px;
+    }
+
+    .toast.success { border-left: 3px solid var(--accent-emerald); }
+    .toast.error { border-left: 3px solid var(--accent-red); }
+    .toast.info { border-left: 3px solid var(--accent-blue); }
+
+    @keyframes toastSlide {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 14px 24px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 30px;
+      background: var(--bg-canvas);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Ops Navbar -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand-group">
+        <div class="brand-crest">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2zm-8.2 8.77l8.2 3.73 8.2-3.73v4.46l-8.2 3.73-8.2-3.73v-4.46zM12 21.36l-7.2-3.27v-2.36l7.2 3.27 7.2-3.27v2.36L12 21.36z"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <div class="brand-title-row">
+            <span class="brand-title">Winslow Accord Ops</span>
+            <div class="clan-status-pill" id="openSettingsBtn" title="Click to edit Clan settings">
+              <span id="navClanName">Winslow Accord</span>
+              <span style="opacity: 0.6;">(ID: <span id="navClanId">825966682</span>)</span>
+              <span>⚙️</span>
+            </div>
+          </div>
+          <span class="brand-subtitle">Event Attendance &amp; Clan Labs Slash Command Generator</span>
+        </div>
+      </div>
+
+      <!-- Quick Stats in Navbar -->
+      <div class="navbar-stats">
+        <div class="nav-stat-item">
+          <span>Events:</span>
+          <span class="nav-stat-value" id="navStatEvents">0</span>
+        </div>
+        <div class="nav-stat-item">
+          <span>Players:</span>
+          <span class="nav-stat-value" id="navStatPlayers">0</span>
+        </div>
+        <div class="nav-stat-item">
+          <span>Total XP:</span>
+          <span class="nav-stat-value" id="navStatTotalXP">0</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="navbar-actions">
+        <div class="xp-pill-box" title="XP awarded per verified clan attendee for a WIN">
+          <span class="xp-pill-label win">Win:</span>
+          <input type="number" id="globalWinXP" class="xp-pill-input" value="10" min="0" max="1000">
+        </div>
+        <div class="xp-pill-box" title="XP awarded per verified clan attendee for a LOSS">
+          <span class="xp-pill-label loss">Loss:</span>
+          <input type="number" id="globalLossXP" class="xp-pill-input" value="5" min="0" max="1000">
+        </div>
+        <button id="resetAllBtn" class="btn btn-secondary btn-sm" title="Clear all staged files and events">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Section 1: Upload Screenshots -->
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+            Screenshot Ingestion &amp; Optical Transcription
+          </div>
+        </div>
+        <span class="card-subtitle">Powered by Gemini Vision &amp; Roblox Clan Group Verifier</span>
+      </div>
+      <div class="card-body">
+        <div class="dropzone-container" id="uploadDropZone">
+          <input type="file" id="filePicker" class="file-input-hidden" multiple accept=".png,.jpg,.jpeg,image/*">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 15h2v3h12v-3h2v3c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-3zm4.41-6.59L11 5.83V16h2V5.83l2.59 2.58L17 7l-5-5-5 5 1.41 1.41z"/>
+          </svg>
+          <div class="dropzone-title">Drag &amp; drop Roblox match screenshots or browse files</div>
+          <div class="dropzone-hint">Supports PNG, JPG, or JPEG • Batch upload supported</div>
+        </div>
+
+        <!-- Staged files grid -->
+        <div id="stagedFilesContainer" class="staged-files-wrap" style="display: none;">
+          <div class="staged-files-header">
+            <span>Staged Screenshots (<span id="stagedCount">0</span>)</span>
+            <button id="clearStagedBtn" class="btn-danger-ghost btn-sm">Clear Staged</button>
+          </div>
+          <div class="staged-grid" id="stagedFilesGrid"></div>
+        </div>
+
+        <!-- Extract Action Button -->
+        <div class="extract-bar">
+          <div class="extract-status" id="extractStatusText">
+            <span>Upload screenshots to extract match scores, player stats, and clan verification.</span>
+          </div>
+          <button id="extractBtn" class="btn btn-primary" disabled>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            <span>Extract &amp; Match Roster</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Processed Events List -->
+    <section class="card" id="eventsSection" style="display: none;">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Processed Matches &amp; Events (<span id="eventsCountBadge">0</span>)
+          </div>
+        </div>
+        <span class="card-subtitle">Set WIN / LOSS status, select your clan team, and copy Clan Labs slash command</span>
+      </div>
+      <div class="card-body">
+        <div class="events-stack" id="eventsContainer">
+          <!-- Dynamically populated event cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Live XP Leaderboard & Slash Command Batch Exporter -->
+    <section class="card" id="leaderboardSection" style="display: none;">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+            Session XP Leaderboard &amp; Export Center
+          </div>
+        </div>
+        <div class="navbar-actions">
+          <button id="openBatchCommandsBtn" class="btn btn-copy btn-sm" title="Generate Clan Labs commands grouped by XP">
+            ⚡ Batch Clan Labs Commands
+          </button>
+          <button id="copyDiscordBtn" class="btn btn-secondary btn-sm" title="Copy clean Discord formatted attendance list">
+            📋 Copy Discord Roster
+          </button>
+          <button id="copyMarkdownBtn" class="btn btn-secondary btn-sm" title="Copy markdown formatted table">
+            📋 Copy Markdown
+          </button>
+          <button id="exportCsvBtn" class="btn btn-secondary btn-sm" title="Download spreadsheet CSV">
+            📥 Export CSV
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- KPI Cards -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <span class="kpi-title">Total Matches</span>
+            <span class="kpi-val" id="kpiTotalEvents">0</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Unique Clan Attendees</span>
+            <span class="kpi-val" id="kpiUniquePlayers">0</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Cumulative XP Awarded</span>
+            <span class="kpi-val" id="kpiTotalXP" style="color: #34d399;">0 XP</span>
+          </div>
+        </div>
+
+        <!-- Leaderboard Search & Table -->
+        <div class="leaderboard-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="leaderboardSearchInput" class="search-input" placeholder="Search player, Discord ID, or rank...">
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            Ordered by Total XP (descending) &bull; Verified attendance records
+          </div>
+        </div>
+
+        <div class="leaderboard-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Rank</th>
+                <th>Roblox Player</th>
+                <th>Discord ID</th>
+                <th>Clan Role</th>
+                <th style="text-align: center;">Events</th>
+                <th style="text-align: center;">Wins</th>
+                <th style="text-align: center;">Losses</th>
+                <th style="text-align: center;">Total Kills</th>
+                <th style="text-align: right;">Total XP</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clan Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ Clan Verification &amp; XP Engine Settings</div>
+        <button class="modal-close" id="closeSettingsBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="settingsClanName">Clan Name</label>
+          <input type="text" id="settingsClanName" class="form-input" value="Winslow Accord">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="settingsClanGroupId">Roblox Group ID</label>
+          <input type="number" id="settingsClanGroupId" class="form-input" value="825966682">
+          <span style="font-size: 0.725rem; color: var(--text-muted);">Used to fetch group member roles and identify official clan rosters.</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label" for="settingsWinXP">Win XP</label>
+            <input type="number" id="settingsWinXP" class="form-input" value="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="settingsLossXP">Loss XP</label>
+            <input type="number" id="settingsLossXP" class="form-input" value="5">
+          </div>
+        </div>
+        <div class="form-group" style="padding-top: 6px; border-top: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label class="form-label">Discord ID Local Cache</label>
+            <span id="discordIdCacheCount" style="font-size: 0.725rem; color: var(--text-muted); font-family: var(--font-mono);">0 cached</span>
+          </div>
+          <button id="clearDiscordCacheBtn" class="btn btn-secondary btn-sm" style="align-self: flex-start; margin-top: 4px;">
+            Clear Stored Discord IDs
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" id="cancelSettingsBtn">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="saveSettingsBtn">Save &amp; Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch Clan Labs Commands Modal -->
+  <div class="modal-backdrop" id="batchCommandsModal">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title">⚡ Session Clan Labs Slash Commands</div>
+        <button class="modal-close" id="closeBatchCommandsBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+          Commands grouped by total XP awarded. Run these in your Clan Labs bot Discord channel:
+        </div>
+        <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+          <!-- Dynamically populated commands -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" id="copyAllBatchBtn">Copy All Commands</button>
+        <button class="btn btn-primary btn-sm" id="doneBatchBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer>
+    Winslow Accord Ops &bull; Modern Roblox Clan Event Ingestion, OCR Verification &amp; Clan Labs Command Tool
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    (function () {
+      "use strict";
+
+      // Application State
+      const state = {
+        config: {
+          clan_name: "Winslow Accord",
+          clan_group_id: 825966682,
+          win_xp: 10,
+          loss_xp: 5,
+        },
+        stagedFiles: [],
+        events: [],
+        calculatedXPResult: null,
+        playerRoles: {},      // username.toLowerCase() -> clan_role
+        discordIds: {},       // username.toLowerCase() -> discord_id (persisted in localStorage)
+      };
+
+      const STORAGE_KEY_DISCORD_IDS = "roblox_clan_discord_ids_v1";
+
+      // Load persisted Discord IDs from localStorage
+      function loadPersistedDiscordIds() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_DISCORD_IDS);
+          if (raw) {
+            state.discordIds = JSON.parse(raw) || {};
+          }
+        } catch (e) {
+          console.warn("Failed to load discordIds from localStorage", e);
+          state.discordIds = {};
+        }
+      }
+
+      function savePersistedDiscordIds() {
+        try {
+          localStorage.setItem(STORAGE_KEY_DISCORD_IDS, JSON.stringify(state.discordIds));
+        } catch (e) {
+          console.warn("Failed to save discordIds to localStorage", e);
+        }
+        updateCacheCountUI();
+      }
+
+      function updateCacheCountUI() {
+        const count = Object.keys(state.discordIds).length;
+        const el = document.getElementById("discordIdCacheCount");
+        if (el) el.textContent = `${count} cached ID(s)`;
+      }
+
+      function cleanDiscordId(raw) {
+        if (!raw) return "";
+        const str = String(raw).trim();
+        // Extract snowflake numeric ID if user pasted `<@123456789012345678>` or `123456789012345678`
+        const match = str.match(/\d{15,21}/);
+        if (match) return match[0];
+        // If not matching standard snowflake length, remove <, @, > and return
+        return str.replace(/[<@>!]/g, "").trim();
+      }
+
+      function setPlayerDiscordId(username, rawId) {
+        if (!username) return;
+        const cleaned = cleanDiscordId(rawId);
+        const key = username.toLowerCase();
+        if (cleaned) {
+          state.discordIds[key] = cleaned;
+        } else {
+          delete state.discordIds[key];
+        }
+        savePersistedDiscordIds();
+
+        // Update all active events for this player
+        state.events.forEach((evt) => {
+          evt.teams.forEach((team) => {
+            (team.players || []).forEach((p) => {
+              const pKey = (p.verified_name || p.username || "").toLowerCase();
+              if (pKey === key) {
+                p.discord_id = cleaned;
+              }
+            });
+          });
+        });
+
+        // Re-render slash command box on active cards
+        updateAllClanLabsBoxes();
+      }
+
+      // DOM Elements Cache
+      const els = {
+        navClanName: document.getElementById("navClanName"),
+        navClanId: document.getElementById("navClanId"),
+        navStatEvents: document.getElementById("navStatEvents"),
+        navStatPlayers: document.getElementById("navStatPlayers"),
+        navStatTotalXP: document.getElementById("navStatTotalXP"),
+        openSettingsBtn: document.getElementById("openSettingsBtn"),
+        settingsModal: document.getElementById("settingsModal"),
+        closeSettingsBtn: document.getElementById("closeSettingsBtn"),
+        cancelSettingsBtn: document.getElementById("cancelSettingsBtn"),
+        saveSettingsBtn: document.getElementById("saveSettingsBtn"),
+        settingsClanName: document.getElementById("settingsClanName"),
+        settingsClanGroupId: document.getElementById("settingsClanGroupId"),
+        settingsWinXP: document.getElementById("settingsWinXP"),
+        settingsLossXP: document.getElementById("settingsLossXP"),
+        clearDiscordCacheBtn: document.getElementById("clearDiscordCacheBtn"),
+        globalWinXP: document.getElementById("globalWinXP"),
+        globalLossXP: document.getElementById("globalLossXP"),
+        resetAllBtn: document.getElementById("resetAllBtn"),
+        uploadDropZone: document.getElementById("uploadDropZone"),
+        filePicker: document.getElementById("filePicker"),
+        stagedFilesContainer: document.getElementById("stagedFilesContainer"),
+        stagedFilesGrid: document.getElementById("stagedFilesGrid"),
+        stagedCount: document.getElementById("stagedCount"),
+        clearStagedBtn: document.getElementById("clearStagedBtn"),
+        extractBtn: document.getElementById("extractBtn"),
+        extractStatusText: document.getElementById("extractStatusText"),
+        eventsSection: document.getElementById("eventsSection"),
+        eventsCountBadge: document.getElementById("eventsCountBadge"),
+        eventsContainer: document.getElementById("eventsContainer"),
+        leaderboardSection: document.getElementById("leaderboardSection"),
+        kpiTotalEvents: document.getElementById("kpiTotalEvents"),
+        kpiUniquePlayers: document.getElementById("kpiUniquePlayers"),
+        kpiTotalXP: document.getElementById("kpiTotalXP"),
+        leaderboardSearchInput: document.getElementById("leaderboardSearchInput"),
+        leaderboardTableBody: document.getElementById("leaderboardTableBody"),
+        openBatchCommandsBtn: document.getElementById("openBatchCommandsBtn"),
+        batchCommandsModal: document.getElementById("batchCommandsModal"),
+        closeBatchCommandsBtn: document.getElementById("closeBatchCommandsBtn"),
+        doneBatchBtn: document.getElementById("doneBatchBtn"),
+        copyAllBatchBtn: document.getElementById("copyAllBatchBtn"),
+        batchCommandsContainer: document.getElementById("batchCommandsContainer"),
+        copyDiscordBtn: document.getElementById("copyDiscordBtn"),
+        copyMarkdownBtn: document.getElementById("copyMarkdownBtn"),
+        exportCsvBtn: document.getElementById("exportCsvBtn"),
+        toastContainer: document.getElementById("toastContainer"),
+      };
+
+      // Toast Notifications
+      function showToast(message, type = "info", duration = 3500) {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        let icon = "ℹ️";
+        if (type === "success") icon = "✓";
+        if (type === "error") icon = "✕";
+
+        toast.innerHTML = `<span style="font-weight:700;">${icon}</span><span>${escapeHtml(message)}</span>`;
+        els.toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.transition = "all 0.2s ease";
+          toast.style.opacity = "0";
+          toast.style.transform = "translateY(10px)";
+          setTimeout(() => toast.remove(), 200);
+        }, duration);
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Initialize Runtime Config from Server
+      async function initConfig() {
+        loadPersistedDiscordIds();
+        updateCacheCountUI();
+
+        try {
+          const res = await fetch("/api/config");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.default_clan_name) state.config.clan_name = data.default_clan_name;
+            if (data.default_clan_group_id) state.config.clan_group_id = data.default_clan_group_id;
+            if (typeof data.win_xp === "number") state.config.win_xp = data.win_xp;
+            if (typeof data.loss_xp === "number") state.config.loss_xp = data.loss_xp;
+            updateHeaderConfigUI();
+          }
+        } catch (err) {
+          console.warn("Could not load /api/config, fallback to defaults", err);
+        }
+      }
+
+      function updateHeaderConfigUI() {
+        els.navClanName.textContent = state.config.clan_name;
+        els.navClanId.textContent = state.config.clan_group_id;
+        els.globalWinXP.value = state.config.win_xp;
+        els.globalLossXP.value = state.config.loss_xp;
+        els.settingsClanName.value = state.config.clan_name;
+        els.settingsClanGroupId.value = state.config.clan_group_id;
+        els.settingsWinXP.value = state.config.win_xp;
+        els.settingsLossXP.value = state.config.loss_xp;
+      }
+
+      // File Staging Handlers
+      function handleFilesSelected(fileList) {
+        const incoming = Array.from(fileList).filter((f) => {
+          return f.type.startsWith("image/") || /\.(png|jpe?g)$/i.test(f.name);
+        });
+
+        if (!incoming.length) {
+          showToast("Please choose valid image files (.png, .jpg, .jpeg)", "error");
+          return;
+        }
+
+        incoming.forEach((file) => {
+          const exists = state.stagedFiles.some(
+            (sf) => sf.name === file.name && sf.size === file.size
+          );
+          if (!exists) {
+            state.stagedFiles.push(file);
+          }
+        });
+
+        renderStagedFiles();
+      }
+
+      function renderStagedFiles() {
+        els.stagedFilesGrid.innerHTML = "";
+        const count = state.stagedFiles.length;
+        els.stagedCount.textContent = count;
+
+        if (count > 0) {
+          els.stagedFilesContainer.style.display = "block";
+          els.extractBtn.disabled = false;
+          els.extractStatusText.innerHTML = `<span><strong>${count}</strong> screenshot(s) staged and ready.</span>`;
+
+          state.stagedFiles.forEach((file, idx) => {
+            const chip = document.createElement("div");
+            chip.className = "file-chip";
+
+            const thumbUrl = URL.createObjectURL(file);
+            const sizeStr = (file.size / 1024).toFixed(1) + " KB";
+
+            chip.innerHTML = `
+              <img src="${thumbUrl}" class="file-chip-thumb" alt="preview">
+              <div class="file-chip-info">
+                <div class="file-chip-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
+                <div class="file-chip-size">${sizeStr}</div>
+              </div>
+              <button class="file-chip-remove" title="Remove" data-idx="${idx}">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            `;
+
+            chip.querySelector(".file-chip-remove").addEventListener("click", (e) => {
+              e.stopPropagation();
+              state.stagedFiles.splice(idx, 1);
+              renderStagedFiles();
+            });
+
+            els.stagedFilesGrid.appendChild(chip);
+          });
+        } else {
+          els.stagedFilesContainer.style.display = "none";
+          els.extractBtn.disabled = true;
+          els.extractStatusText.innerHTML = `<span>Upload screenshots to extract match scores, player stats, and clan verification.</span>`;
+        }
+      }
+
+      // Drag & Drop
+      ["dragenter", "dragover"].forEach((evtName) => {
+        els.uploadDropZone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          els.uploadDropZone.classList.add("dragover");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((evtName) => {
+        els.uploadDropZone.addEventListener(evtName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          els.uploadDropZone.classList.remove("dragover");
+        });
+      });
+
+      els.uploadDropZone.addEventListener("drop", (e) => {
+        if (e.dataTransfer && e.dataTransfer.files) {
+          handleFilesSelected(e.dataTransfer.files);
+        }
+      });
+
+      els.filePicker.addEventListener("change", (e) => {
+        if (e.target.files) {
+          handleFilesSelected(e.target.files);
+          els.filePicker.value = "";
+        }
+      });
+
+      els.clearStagedBtn.addEventListener("click", () => {
+        state.stagedFiles = [];
+        renderStagedFiles();
+      });
+
+      // API: Extract Leaderboard Screenshots
+      async function extractScreenshots() {
+        if (!state.stagedFiles.length) return;
+
+        const formData = new FormData();
+        state.stagedFiles.forEach((f) => formData.append("files", f));
+        if (state.config.clan_group_id) {
+          formData.append("clan_group_id", state.config.clan_group_id);
+        }
+
+        els.extractBtn.disabled = true;
+        els.extractBtn.innerHTML = `
+          <div class="spinner"></div>
+          <span>Transcribing &amp; Matching...</span>
+        `;
+        els.extractStatusText.innerHTML = `
+          <div class="spinner blue"></div>
+          <span>Transcribing screenshot via Gemini Vision and querying Roblox group members...</span>
+        `;
+
+        try {
+          const resp = await fetch("/api/extract", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error(errData.detail || `Server returned ${resp.status}`);
+          }
+
+          const extractedEvents = await resp.json();
+          if (!Array.isArray(extractedEvents) || !extractedEvents.length) {
+            throw new Error("No event data was extracted from the provided images.");
+          }
+
+          extractedEvents.forEach((item) => {
+            const eventId = "evt_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+            const teams = item.teams || [];
+
+            // Detect clan team by highest count of verified clan members
+            let bestTeamIndex = 0;
+            let maxClanCount = -1;
+
+            teams.forEach((t, tIdx) => {
+              const clanCount = (t.players || []).filter((p) => p.in_clan).length;
+              if (clanCount > maxClanCount) {
+                maxClanCount = clanCount;
+                bestTeamIndex = tIdx;
+              }
+            });
+
+            // Cache player roles and pre-fill discord IDs from persistence
+            teams.forEach((t) => {
+              (t.players || []).forEach((p) => {
+                const name = p.verified_name || p.username;
+                if (name) {
+                  const key = name.toLowerCase();
+                  if (p.clan_role) state.playerRoles[key] = p.clan_role;
+                  if (state.discordIds[key]) {
+                    p.discord_id = state.discordIds[key];
+                  }
+                }
+              });
+            });
+
+            state.events.push({
+              id: eventId,
+              title: item.match_title || item.filename || `Match #${state.events.length + 1}`,
+              filename: item.filename || "",
+              isWin: true,
+              teams: teams,
+              selectedTeamIndex: bestTeamIndex,
+            });
+          });
+
+          showToast(`Successfully processed ${extractedEvents.length} event(s)!`, "success");
+          state.stagedFiles = [];
+          renderStagedFiles();
+          renderEvents();
+          await recalculateXP();
+        } catch (err) {
+          console.error("Extraction error:", err);
+          showToast(`Extraction Failed: ${err.message}`, "error", 5000);
+          els.extractStatusText.innerHTML = `<span style="color: var(--accent-red)">⚠️ ${escapeHtml(err.message)}</span>`;
+        } finally {
+          els.extractBtn.disabled = state.stagedFiles.length === 0;
+          els.extractBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            <span>Extract &amp; Match Roster</span>
+          `;
+        }
+      }
+
+      els.extractBtn.addEventListener("click", extractScreenshots);
+
+      // Render Processed Events
+      function renderEvents() {
+        const count = state.events.length;
+        els.eventsCountBadge.textContent = count;
+
+        if (count === 0) {
+          els.eventsSection.style.display = "none";
+          els.leaderboardSection.style.display = "none";
+          els.eventsContainer.innerHTML = "";
+          updateGlobalNavStats({ total_events: 0, unique_players: 0, total_xp_awarded: 0 });
+          return;
+        }
+
+        els.eventsSection.style.display = "block";
+        els.leaderboardSection.style.display = "block";
+        els.eventsContainer.innerHTML = "";
+
+        state.events.forEach((evt, evtIndex) => {
+          const card = document.createElement("div");
+          card.className = "event-card";
+          card.id = `card_${evt.id}`;
+
+          // Header
+          const header = document.createElement("div");
+          header.className = "event-header";
+
+          const titleWrap = document.createElement("div");
+          titleWrap.className = "event-title-wrap";
+          titleWrap.innerHTML = `
+            <span class="event-num-badge">#${evtIndex + 1}</span>
+            <input type="text" class="event-title-input" value="${escapeHtml(evt.title)}" title="Click to rename event">
+          `;
+
+          const titleInput = titleWrap.querySelector(".event-title-input");
+          titleInput.addEventListener("change", (e) => {
+            evt.title = e.target.value.trim() || `Match #${evtIndex + 1}`;
+            recalculateXP();
+          });
+
+          // Controls (Win/Loss Segmented Pill + Delete)
+          const controls = document.createElement("div");
+          controls.className = "event-controls";
+
+          const winLossSegmented = document.createElement("div");
+          winLossSegmented.className = "win-loss-segmented";
+          winLossSegmented.innerHTML = `
+            <div class="segmented-btn win ${evt.isWin ? 'active' : ''}">
+              <span>🏆 WIN (+${state.config.win_xp} XP)</span>
+            </div>
+            <div class="segmented-btn loss ${!evt.isWin ? 'active' : ''}">
+              <span>💀 LOSS (+${state.config.loss_xp} XP)</span>
+            </div>
+          `;
+
+          winLossSegmented.querySelector(".win").addEventListener("click", () => {
+            if (!evt.isWin) {
+              evt.isWin = true;
+              renderEvents();
+              recalculateXP();
+            }
+          });
+
+          winLossSegmented.querySelector(".loss").addEventListener("click", () => {
+            if (evt.isWin) {
+              evt.isWin = false;
+              renderEvents();
+              recalculateXP();
+            }
+          });
+
+          const deleteEventBtn = document.createElement("button");
+          deleteEventBtn.className = "btn-danger-ghost btn-sm";
+          deleteEventBtn.title = "Delete this match event";
+          deleteEventBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          `;
+          deleteEventBtn.addEventListener("click", () => {
+            state.events.splice(evtIndex, 1);
+            renderEvents();
+            recalculateXP();
+          });
+
+          controls.appendChild(winLossSegmented);
+          controls.appendChild(deleteEventBtn);
+
+          header.appendChild(titleWrap);
+          header.appendChild(controls);
+          card.appendChild(header);
+
+          // Team Selector Bar
+          const teamTabsBar = document.createElement("div");
+          teamTabsBar.className = "team-tabs-bar";
+
+          const tabLabel = document.createElement("span");
+          tabLabel.className = "team-tab-label";
+          tabLabel.textContent = "Clan Team:";
+          teamTabsBar.appendChild(tabLabel);
+
+          evt.teams.forEach((team, tIdx) => {
+            const hasClan = (team.players || []).some((p) => p.in_clan);
+            const tab = document.createElement("div");
+            tab.className = `team-tab ${tIdx === evt.selectedTeamIndex ? 'active' : ''}`;
+            tab.innerHTML = `
+              <span>${escapeHtml(team.team_name || `Team ${tIdx + 1}`)} (${team.players ? team.players.length : 0})</span>
+              ${hasClan ? '<span class="team-clan-chip">Clan Roster</span>' : ''}
+            `;
+
+            tab.addEventListener("click", () => {
+              if (evt.selectedTeamIndex !== tIdx) {
+                evt.selectedTeamIndex = tIdx;
+                renderEvents();
+                recalculateXP();
+              }
+            });
+
+            teamTabsBar.appendChild(tab);
+          });
+
+          card.appendChild(teamTabsBar);
+
+          // Roster Body
+          const rosterWrap = document.createElement("div");
+          rosterWrap.className = "roster-wrap";
+
+          const currentTeam = evt.teams[evt.selectedTeamIndex] || { players: [] };
+          const players = currentTeam.players || [];
+
+          if (players.length === 0) {
+            rosterWrap.innerHTML = `
+              <div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+                No players detected in this team. Use the form below to manually add players.
+              </div>
+            `;
+          } else {
+            const tableContainer = document.createElement("div");
+            tableContainer.className = "roster-table-container";
+
+            const table = document.createElement("table");
+            table.className = "roster-table";
+            table.innerHTML = `
+              <thead>
+                <tr>
+                  <th>Player Username</th>
+                  <th>Verification</th>
+                  <th>Clan Role</th>
+                  <th>Discord ID / Snowflake</th>
+                  <th style="text-align: center;">Kills</th>
+                  <th style="text-align: center;">Damage</th>
+                  <th style="text-align: center;">Heals</th>
+                  <th style="text-align: center;">Caps</th>
+                  <th style="width: 36px;"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            `;
+
+            const tbody = table.querySelector("tbody");
+
+            players.forEach((player, pIdx) => {
+              const tr = document.createElement("tr");
+              tr.id = `row_${evt.id}_${pIdx}`;
+
+              const rawName = player.username || "";
+              const verifiedName = player.verified_name || rawName;
+              const isDisambiguated = rawName && verifiedName && (rawName.toLowerCase() !== verifiedName.toLowerCase() || rawName !== verifiedName);
+
+              // Avatar & Name
+              const avatarLetter = (verifiedName[0] || "?").toUpperCase();
+              let disambigHtml = "";
+              if (isDisambiguated) {
+                disambigHtml = `<span class="disambig-tag">OCR: ${escapeHtml(rawName)}</span>`;
+              }
+
+              // Status Dot
+              const isVerified = Boolean(player.is_verified || player.user_id);
+              const statusDotHtml = isVerified
+                ? `<div class="status-dot-wrap"><span class="status-dot verified"></span><span style="color:#34d399;">Verified</span></div>`
+                : `<div class="status-dot-wrap"><span class="status-dot unverified"></span><span style="color:#fbbf24;">Unverified</span></div>`;
+
+              // Role chip
+              let roleName = "Guest / Non-Clan";
+              let roleClass = "guest";
+              if (player.in_clan) {
+                roleName = player.clan_role || "Clan Member";
+                const rl = roleName.toLowerCase();
+                if (rl.includes("marshal") || rl.includes("commander") || rl.includes("leader")) {
+                  roleClass = "officer";
+                } else if (rl.includes("captain") || rl.includes("officer") || rl.includes("lieutenant")) {
+                  roleClass = "captain";
+                } else if (rl.includes("sergeant") || rl.includes("specialist")) {
+                  roleClass = "member";
+                } else {
+                  roleClass = "private";
+                }
+              }
+
+              const roleChipHtml = `
+                <div class="role-chip">
+                  <span class="role-dot ${roleClass}"></span>
+                  <span>${escapeHtml(roleName)}</span>
+                </div>
+              `;
+
+              // Discord ID value
+              const currentDiscordId = player.discord_id || state.discordIds[verifiedName.toLowerCase()] || "";
+              const isMissingId = !currentDiscordId;
+
+              tr.innerHTML = `
+                <td>
+                  <div class="player-cell">
+                    <div class="player-avatar">${escapeHtml(avatarLetter)}</div>
+                    <div class="player-name-col">
+                      <span class="player-name-text">${escapeHtml(verifiedName)}</span>
+                      ${disambigHtml}
+                    </div>
+                  </div>
+                </td>
+                <td>${statusDotHtml}</td>
+                <td>${roleChipHtml}</td>
+                <td>
+                  <div class="discord-id-cell-wrap">
+                    <input type="text"
+                      class="discord-id-input ${isMissingId ? 'missing' : ''}"
+                      placeholder="e.g. 289456182901234567"
+                      value="${escapeHtml(currentDiscordId)}"
+                      data-username="${escapeHtml(verifiedName)}"
+                      title="Paste Discord User ID or @mention (persists automatically)">
+                  </div>
+                </td>
+                <td style="text-align: center;"><span class="stat-num">${player.kills || 0}</span></td>
+                <td style="text-align: center;"><span class="stat-num">${player.damage || 0}</span></td>
+                <td style="text-align: center;"><span class="stat-num">${player.heals || 0}</span></td>
+                <td style="text-align: center;"><span class="stat-num">${player.caps || 0}</span></td>
+                <td style="text-align: right;">
+                  <button class="btn-danger-ghost btn-sm remove-player-btn" data-pidx="${pIdx}" title="Remove player from event">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                  </button>
+                </td>
+              `;
+
+              // Inline Discord ID input handler
+              const idInput = tr.querySelector(".discord-id-input");
+              idInput.addEventListener("input", (e) => {
+                const cleaned = cleanDiscordId(e.target.value);
+                player.discord_id = cleaned;
+                setPlayerDiscordId(verifiedName, cleaned);
+                if (cleaned) {
+                  idInput.classList.remove("missing");
+                } else {
+                  idInput.classList.add("missing");
+                }
+              });
+
+              tr.querySelector(".remove-player-btn").addEventListener("click", () => {
+                players.splice(pIdx, 1);
+                renderEvents();
+                recalculateXP();
+              });
+
+              tbody.appendChild(tr);
+            });
+
+            tableContainer.appendChild(table);
+            rosterWrap.appendChild(tableContainer);
+          }
+
+          // Add Player Bar
+          const addPlayerBar = document.createElement("div");
+          addPlayerBar.className = "add-player-row";
+          addPlayerBar.innerHTML = `
+            <span style="font-size: 0.725rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">+ Add Player:</span>
+            <input type="text" class="add-player-input" placeholder="Roblox Username">
+            <input type="number" class="stat-input-mini" placeholder="Kills" value="0" min="0" title="Kills">
+            <input type="number" class="stat-input-mini" placeholder="Dmg" value="0" min="0" title="Damage">
+            <button class="btn btn-secondary btn-sm add-player-submit">Add to Roster</button>
+          `;
+
+          const usernameInput = addPlayerBar.querySelector(".add-player-input");
+          const killsInput = addPlayerBar.querySelectorAll(".stat-input-mini")[0];
+          const damageInput = addPlayerBar.querySelectorAll(".stat-input-mini")[1];
+          const submitBtn = addPlayerBar.querySelector(".add-player-submit");
+
+          async function submitNewPlayer() {
+            const rawName = usernameInput.value.trim();
+            if (!rawName) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<div class="spinner"></div>`;
+
+            try {
+              const verifyResp = await fetch("/api/verify_user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  username: rawName,
+                  clan_group_id: state.config.clan_group_id,
+                }),
+              });
+
+              let verifiedInfo = {};
+              if (verifyResp.ok) {
+                verifiedInfo = await verifyResp.json();
+              }
+
+              const vName = verifiedInfo.verified_name || rawName;
+              const newPlayer = {
+                username: rawName,
+                verified_name: vName,
+                user_id: verifiedInfo.user_id || null,
+                in_clan: Boolean(verifiedInfo.in_clan),
+                clan_role: verifiedInfo.clan_role || null,
+                is_verified: Boolean(verifiedInfo.is_verified),
+                discord_id: state.discordIds[vName.toLowerCase()] || "",
+                kills: parseInt(killsInput.value, 10) || 0,
+                damage: parseInt(damageInput.value, 10) || 0,
+                heals: 0,
+                caps: 0,
+              };
+
+              if (newPlayer.clan_role) {
+                state.playerRoles[vName.toLowerCase()] = newPlayer.clan_role;
+              }
+
+              if (!currentTeam.players) currentTeam.players = [];
+              currentTeam.players.push(newPlayer);
+
+              showToast(`Added player "${vName}"`, "success");
+              renderEvents();
+              await recalculateXP();
+            } catch (err) {
+              console.error("Error adding player:", err);
+              showToast("Failed to verify/add player", "error");
+            } finally {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = `<span>Add to Roster</span>`;
+            }
+          }
+
+          submitBtn.addEventListener("click", submitNewPlayer);
+          usernameInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") submitNewPlayer();
+          });
+
+          rosterWrap.appendChild(addPlayerBar);
+
+          // Clan Labs Slash Command Box
+          const clanLabsBox = renderClanLabsBoxForEvent(evt, players);
+          rosterWrap.appendChild(clanLabsBox);
+
+          card.appendChild(rosterWrap);
+          els.eventsContainer.appendChild(card);
+        });
+      }
+
+      // Generate Clan Labs Slash Command Box for single event
+      function renderClanLabsBoxForEvent(evt, players) {
+        const wrap = document.createElement("div");
+        wrap.className = "clan-labs-section";
+        wrap.id = `clan_labs_${evt.id}`;
+
+        const xpAmount = evt.isWin ? state.config.win_xp : state.config.loss_xp;
+
+        // Collect users
+        const validUsers = [];
+        const missingUsers = [];
+
+        players.forEach((p) => {
+          const vName = p.verified_name || p.username;
+          const dId = p.discord_id || state.discordIds[vName.toLowerCase()];
+          if (dId) {
+            validUsers.push({ name: vName, id: dId });
+          } else {
+            missingUsers.push({ name: vName, p: p });
+          }
+        });
+
+        // Slash command string for copy
+        let rawCommand = "";
+        let formattedHtml = "";
+
+        if (validUsers.length === 0 && missingUsers.length === 0) {
+          rawCommand = `# No players in roster for event`;
+          formattedHtml = `<span style="color:var(--text-muted)">// No players on team roster</span>`;
+        } else {
+          const userTokens = [];
+          const userHtmlTokens = [];
+
+          validUsers.forEach((u) => {
+            userTokens.push(`<@${u.id}>`);
+            userHtmlTokens.push(`<span class="cmd-id">&lt;@${escapeHtml(u.id)}&gt;</span>`);
+          });
+
+          missingUsers.forEach((m) => {
+            userTokens.push(`<MISSING_ID_${m.name}>`);
+            userHtmlTokens.push(`<span class="cmd-missing">&lt;MISSING_ID_${escapeHtml(m.name)}&gt;</span>`);
+          });
+
+          rawCommand = `/xp users:${userTokens.join(" ")} action:Add amount:${xpAmount}`;
+          formattedHtml = `<span class="cmd-root">/xp</span> <span class="cmd-param">users:</span>${userHtmlTokens.join(" ")} <span class="cmd-param">action:</span><span class="cmd-action">Add</span> <span class="cmd-param">amount:</span><span class="cmd-amount">${xpAmount}</span>`;
+        }
+
+        const header = document.createElement("div");
+        header.className = "clan-labs-header";
+        header.innerHTML = `
+          <div class="clan-labs-title">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Clan Labs Slash Command (Match XP)
+          </div>
+          <button class="btn btn-copy btn-sm copy-cmd-btn" title="Copy slash command for Discord">
+            ⚡ Copy Slash Command
+          </button>
+        `;
+
+        header.querySelector(".copy-cmd-btn").addEventListener("click", () => {
+          copyToClipboard(rawCommand, "⚡ Clan Labs slash command copied to clipboard!");
+        });
+
+        const codeBox = document.createElement("div");
+        codeBox.className = "clan-labs-codebox";
+        codeBox.innerHTML = formattedHtml;
+
+        wrap.appendChild(header);
+        wrap.appendChild(codeBox);
+
+        // Missing ID Alert Banner
+        if (missingUsers.length > 0) {
+          const alert = document.createElement("div");
+          alert.className = "clan-labs-missing-alert";
+          alert.innerHTML = `
+            <span>⚠️ ${missingUsers.length} player(s) missing Discord ID:</span>
+          `;
+
+          missingUsers.forEach((m) => {
+            const jumpBtn = document.createElement("button");
+            jumpBtn.className = "missing-player-jump";
+            jumpBtn.textContent = `@${m.name}`;
+            jumpBtn.title = "Click to jump and enter Discord ID";
+
+            jumpBtn.addEventListener("click", () => {
+              const card = document.getElementById(`card_${evt.id}`);
+              if (!card) return;
+              const input = card.querySelector(`input[data-username="${m.name}"]`);
+              if (input) {
+                input.scrollIntoView({ behavior: "smooth", block: "center" });
+                input.focus();
+                input.classList.add("pulse-highlight");
+                setTimeout(() => input.classList.remove("pulse-highlight"), 1600);
+              }
+            });
+
+            alert.appendChild(jumpBtn);
+          });
+
+          wrap.appendChild(alert);
+        }
+
+        return wrap;
+      }
+
+      function updateAllClanLabsBoxes() {
+        state.events.forEach((evt) => {
+          const currentTeam = evt.teams[evt.selectedTeamIndex] || { players: [] };
+          const existingBox = document.getElementById(`clan_labs_${evt.id}`);
+          if (existingBox && existingBox.parentNode) {
+            const newBox = renderClanLabsBoxForEvent(evt, currentTeam.players || []);
+            existingBox.parentNode.replaceChild(newBox, existingBox);
+          }
+        });
+      }
+
+      // API: Recalculate XP
+      async function recalculateXP() {
+        if (state.events.length === 0) {
+          state.calculatedXPResult = null;
+          renderLeaderboard([]);
+          updateGlobalNavStats({ total_events: 0, unique_players: 0, total_xp_awarded: 0 });
+          return;
+        }
+
+        const payloadEvents = state.events.map((evt) => {
+          const team = evt.teams[evt.selectedTeamIndex] || { players: [] };
+          return {
+            event_id: evt.id,
+            event_name: evt.title || evt.filename || "Match",
+            is_win: evt.isWin,
+            players: (team.players || []).map((p) => ({
+              username: p.username,
+              verified_name: p.verified_name || p.username,
+              user_id: p.user_id,
+              in_clan: p.in_clan,
+              clan_role: p.clan_role,
+              kills: p.kills || 0,
+              damage: p.damage || 0,
+              heals: p.heals || 0,
+              caps: p.caps || 0,
+            })),
+          };
+        });
+
+        try {
+          const resp = await fetch("/api/calculate_xp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              events: payloadEvents,
+              win_xp: state.config.win_xp,
+              loss_xp: state.config.loss_xp,
+            }),
+          });
+
+          if (!resp.ok) {
+            throw new Error(`Calculation error ${resp.status}`);
+          }
+
+          const result = await resp.json();
+          state.calculatedXPResult = result;
+
+          updateGlobalNavStats(result.summary || {});
+          filterAndRenderLeaderboard();
+        } catch (err) {
+          console.error("XP Calculation error:", err);
+          showToast(`XP Calc failed: ${err.message}`, "error");
+        }
+      }
+
+      function updateGlobalNavStats(summary) {
+        const eventsCount = summary.total_events || 0;
+        const playersCount = summary.unique_players || 0;
+        const totalXP = summary.total_xp_awarded || 0;
+
+        els.navStatEvents.textContent = eventsCount;
+        els.navStatPlayers.textContent = playersCount;
+        els.navStatTotalXP.textContent = totalXP;
+
+        els.kpiTotalEvents.textContent = eventsCount;
+        els.kpiUniquePlayers.textContent = playersCount;
+        els.kpiTotalXP.textContent = totalXP + " XP";
+      }
+
+      // Leaderboard Filtering & Rendering
+      function filterAndRenderLeaderboard() {
+        if (!state.calculatedXPResult || !Array.isArray(state.calculatedXPResult.leaderboard)) {
+          renderLeaderboard([]);
+          return;
+        }
+
+        const query = els.leaderboardSearchInput.value.trim().toLowerCase();
+        let items = state.calculatedXPResult.leaderboard;
+
+        if (query) {
+          items = items.filter((p) => {
+            const role = (state.playerRoles[p.username.toLowerCase()] || "").toLowerCase();
+            const dId = (state.discordIds[p.username.toLowerCase()] || "").toLowerCase();
+            return (
+              p.username.toLowerCase().includes(query) ||
+              role.includes(query) ||
+              dId.includes(query)
+            );
+          });
+        }
+
+        renderLeaderboard(items);
+      }
+
+      els.leaderboardSearchInput.addEventListener("input", filterAndRenderLeaderboard);
+
+      function renderLeaderboard(leaderboard) {
+        els.leaderboardTableBody.innerHTML = "";
+
+        if (!leaderboard || leaderboard.length === 0) {
+          els.leaderboardTableBody.innerHTML = `
+            <tr>
+              <td colspan="9" style="padding: 32px; text-align: center; color: var(--text-muted);">
+                No leaderboard records found. Ensure matches have players on the selected clan team.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        leaderboard.forEach((p, idx) => {
+          const rank = idx + 1;
+          const tr = document.createElement("tr");
+
+          let rankClass = "rank-other";
+          if (rank === 1) rankClass = "rank-1";
+          else if (rank === 2) rankClass = "rank-2";
+          else if (rank === 3) rankClass = "rank-3";
+
+          const roleName = state.playerRoles[p.username.toLowerCase()] || "Clan Member";
+          let roleClass = "member";
+          const rl = roleName.toLowerCase();
+          if (rl.includes("marshal") || rl.includes("commander") || rl.includes("leader")) roleClass = "officer";
+          else if (rl.includes("captain") || rl.includes("officer")) roleClass = "captain";
+
+          const dId = state.discordIds[p.username.toLowerCase()] || "";
+          const discordDisplay = dId
+            ? `<span style="font-family:var(--font-mono); font-size:0.75rem; color:#93c5fd;">&lt;@${escapeHtml(dId)}&gt;</span>`
+            : `<span style="font-size:0.7rem; color:var(--text-muted); font-style:italic;">No ID mapped</span>`;
+
+          const avatarLetter = (p.username[0] || "?").toUpperCase();
+
+          tr.innerHTML = `
+            <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+            <td>
+              <div class="player-cell">
+                <div class="player-avatar">${escapeHtml(avatarLetter)}</div>
+                <span style="font-weight:700; color:var(--text-primary);">${escapeHtml(p.username)}</span>
+              </div>
+            </td>
+            <td>${discordDisplay}</td>
+            <td>
+              <div class="role-chip">
+                <span class="role-dot ${roleClass}"></span>
+                <span>${escapeHtml(roleName)}</span>
+              </div>
+            </td>
+            <td style="text-align: center; font-family:var(--font-mono);">${(p.events_attended || []).length}</td>
+            <td style="text-align: center; color: var(--accent-emerald); font-weight:700; font-family:var(--font-mono);">${p.wins || 0}</td>
+            <td style="text-align: center; color: var(--accent-red); font-weight:700; font-family:var(--font-mono);">${p.losses || 0}</td>
+            <td style="text-align: center; font-family:var(--font-mono);">${p.total_kills || 0}</td>
+            <td style="text-align: right;"><span class="xp-badge">${p.total_xp || 0} XP</span></td>
+          `;
+
+          els.leaderboardTableBody.appendChild(tr);
+        });
+      }
+
+      // Batch Clan Labs Commands Generator Modal
+      els.openBatchCommandsBtn.addEventListener("click", () => {
+        if (!state.calculatedXPResult || !state.calculatedXPResult.leaderboard || !state.calculatedXPResult.leaderboard.length) {
+          showToast("No attendance data to generate Clan Labs commands", "error");
+          return;
+        }
+
+        // Group players by total XP awarded
+        const groups = {}; // amount -> [{ username, discord_id }]
+        const missingAny = [];
+
+        state.calculatedXPResult.leaderboard.forEach((p) => {
+          if ((p.total_xp || 0) <= 0) return;
+          const amt = p.total_xp;
+          if (!groups[amt]) groups[amt] = [];
+
+          const dId = state.discordIds[p.username.toLowerCase()];
+          if (dId) {
+            groups[amt].push({ name: p.username, id: dId });
+          } else {
+            groups[amt].push({ name: p.username, missing: true });
+            missingAny.push(p.username);
+          }
+        });
+
+        const amounts = Object.keys(groups).map(Number).sort((a, b) => b - a);
+        els.batchCommandsContainer.innerHTML = "";
+
+        if (amounts.length === 0) {
+          els.batchCommandsContainer.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+              All attendees have 0 XP awarded.
+            </div>
+          `;
+        } else {
+          amounts.forEach((amt) => {
+            const list = groups[amt];
+            const tokens = list.map((item) => item.id ? `<@${item.id}>` : `<MISSING_ID_${item.name}>`);
+            const cmdText = `/xp users:${tokens.join(" ")} action:Add amount:${amt}`;
+
+            const itemWrap = document.createElement("div");
+            itemWrap.className = "clan-labs-section";
+
+            const header = document.createElement("div");
+            header.className = "clan-labs-header";
+            header.innerHTML = `
+              <span style="font-weight:700; font-size:0.75rem; color:#bfdbfe;">
+                ${list.length} Attendees &bull; ${amt} XP Each
+              </span>
+              <button class="btn btn-copy btn-sm copy-single-batch-btn">Copy Command</button>
+            `;
+
+            header.querySelector(".copy-single-batch-btn").addEventListener("click", () => {
+              copyToClipboard(cmdText, `⚡ Copied command for ${amt} XP group!`);
+            });
+
+            const codeBox = document.createElement("div");
+            codeBox.className = "clan-labs-codebox";
+            codeBox.textContent = cmdText;
+
+            itemWrap.appendChild(header);
+            itemWrap.appendChild(codeBox);
+            els.batchCommandsContainer.appendChild(itemWrap);
+          });
+        }
+
+        els.batchCommandsModal.classList.add("open");
+      });
+
+      [els.closeBatchCommandsBtn, els.doneBatchBtn].forEach((btn) => {
+        btn.addEventListener("click", () => els.batchCommandsModal.classList.remove("open"));
+      });
+
+      els.copyAllBatchBtn.addEventListener("click", () => {
+        const boxes = els.batchCommandsContainer.querySelectorAll(".clan-labs-codebox");
+        const allCmds = Array.from(boxes).map((b) => b.textContent.trim()).filter(Boolean);
+        if (allCmds.length === 0) {
+          showToast("No commands to copy", "error");
+          return;
+        }
+        copyToClipboard(allCmds.join("\n\n"), "⚡ All Clan Labs commands copied to clipboard!");
+      });
+
+      // Standard Exports
+      els.copyDiscordBtn.addEventListener("click", () => {
+        if (!state.calculatedXPResult || !state.calculatedXPResult.leaderboard || !state.calculatedXPResult.leaderboard.length) {
+          showToast("No leaderboard data to copy", "error");
+          return;
+        }
+
+        let out = `**${state.config.clan_name} — Event Attendance & XP Summary**\n`;
+        out += `*Generated on ${new Date().toLocaleDateString()}*\n\n`;
+
+        state.calculatedXPResult.leaderboard.forEach((p, idx) => {
+          const role = state.playerRoles[p.username.toLowerCase()] || "Member";
+          const dId = state.discordIds[p.username.toLowerCase()];
+          const discordMention = dId ? ` (<@${dId}>)` : "";
+          out += `${idx + 1}. **${p.username}**${discordMention} [${role}] — **${p.total_xp} XP** (${(p.events_attended || []).length} Matches, ${p.total_kills || 0} Kills)\n`;
+        });
+
+        copyToClipboard(out, "📋 Discord attendance roster copied to clipboard!");
+      });
+
+      els.copyMarkdownBtn.addEventListener("click", () => {
+        if (!state.calculatedXPResult || !state.calculatedXPResult.leaderboard || !state.calculatedXPResult.leaderboard.length) {
+          showToast("No leaderboard data to copy", "error");
+          return;
+        }
+
+        let md = `| Rank | Roblox Player | Discord Mention | Clan Role | Events | Wins | Losses | Kills | Total XP |\n`;
+        md += `| :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n`;
+
+        state.calculatedXPResult.leaderboard.forEach((p, idx) => {
+          const role = state.playerRoles[p.username.toLowerCase()] || "Member";
+          const dId = state.discordIds[p.username.toLowerCase()];
+          const mention = dId ? `<@${dId}>` : "-";
+          md += `| ${idx + 1} | **${p.username}** | ${mention} | ${role} | ${(p.events_attended || []).length} | ${p.wins || 0} | ${p.losses || 0} | ${p.total_kills || 0} | **${p.total_xp || 0} XP** |\n`;
+        });
+
+        copyToClipboard(md, "📋 Markdown table copied to clipboard!");
+      });
+
+      els.exportCsvBtn.addEventListener("click", () => {
+        if (!state.calculatedXPResult || !state.calculatedXPResult.csv_text) {
+          showToast("No CSV data to export", "error");
+          return;
+        }
+
+        const blob = new Blob([state.calculatedXPResult.csv_text], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `clan_events_xp_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast("📥 Exported clan_events_xp.csv", "success");
+      });
+
+      function copyToClipboard(text, successMsg) {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(successMsg, "success");
+          }).catch(() => fallbackCopy(text, successMsg));
+        } else {
+          fallbackCopy(text, successMsg);
+        }
+      }
+
+      function fallbackCopy(text, successMsg) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.top = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand("copy");
+          showToast(successMsg, "success");
+        } catch (e) {
+          showToast("Failed to copy", "error");
+        }
+        document.body.removeChild(ta);
+      }
+
+      // Settings Modal
+      els.openSettingsBtn.addEventListener("click", () => {
+        updateCacheCountUI();
+        els.settingsModal.classList.add("open");
+      });
+
+      [els.closeSettingsBtn, els.cancelSettingsBtn].forEach((btn) => {
+        btn.addEventListener("click", () => els.settingsModal.classList.remove("open"));
+      });
+
+      els.settingsModal.addEventListener("click", (e) => {
+        if (e.target === els.settingsModal) els.settingsModal.classList.remove("open");
+      });
+
+      els.batchCommandsModal.addEventListener("click", (e) => {
+        if (e.target === els.batchCommandsModal) els.batchCommandsModal.classList.remove("open");
+      });
+
+      els.saveSettingsBtn.addEventListener("click", () => {
+        const newName = els.settingsClanName.value.trim() || "Winslow Accord";
+        const newGroupId = parseInt(els.settingsClanGroupId.value, 10) || 825966682;
+        const newWin = parseInt(els.settingsWinXP.value, 10) || 10;
+        const newLoss = parseInt(els.settingsLossXP.value, 10) || 5;
+
+        state.config.clan_name = newName;
+        state.config.clan_group_id = newGroupId;
+        state.config.win_xp = newWin;
+        state.config.loss_xp = newLoss;
+
+        updateHeaderConfigUI();
+        els.settingsModal.classList.remove("open");
+        showToast("Settings applied", "success");
+        renderEvents();
+        recalculateXP();
+      });
+
+      els.clearDiscordCacheBtn.addEventListener("click", () => {
+        if (confirm("Clear all locally stored Discord IDs?")) {
+          state.discordIds = {};
+          localStorage.removeItem(STORAGE_KEY_DISCORD_IDS);
+          updateCacheCountUI();
+          renderEvents();
+          recalculateXP();
+          showToast("Discord ID cache cleared", "info");
+        }
+      });
+
+      // Global Navbar Win / Loss Inputs
+      els.globalWinXP.addEventListener("change", (e) => {
+        const val = parseInt(e.target.value, 10);
+        state.config.win_xp = isNaN(val) ? 10 : val;
+        renderEvents();
+        recalculateXP();
+      });
+
+      els.globalLossXP.addEventListener("change", (e) => {
+        const val = parseInt(e.target.value, 10);
+        state.config.loss_xp = isNaN(val) ? 5 : val;
+        renderEvents();
+        recalculateXP();
+      });
+
+      // Clear / Reset All
+      els.resetAllBtn.addEventListener("click", () => {
+        if (confirm("Clear all staged files and active match events?")) {
+          state.stagedFiles = [];
+          state.events = [];
+          state.calculatedXPResult = null;
+          renderStagedFiles();
+          renderEvents();
+          recalculateXP();
+          showToast("Workspace reset", "info");
+        }
+      });
+
+      // Initialization
+      initConfig();
+    })();
+  </script>
+</body>
+</html>
