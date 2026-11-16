@@ -964,6 +964,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .clan-labs-header {
@@ -998,6 +999,8 @@
       user-select: all;
       line-height: 1.6;
       background: #07090e;
+      min-height: 38px;
+      overflow-x: auto;
     }
 
     .clan-labs-codebox .cmd-root { color: #60a5fa; font-weight: 700; }
@@ -1006,6 +1009,15 @@
     .clan-labs-codebox .cmd-missing { color: #f87171; background: rgba(239, 68, 68, 0.15); padding: 1px 4px; border-radius: 3px; }
     .clan-labs-codebox .cmd-action { color: #34d399; font-weight: 600; }
     .clan-labs-codebox .cmd-amount { color: #fbbf24; font-weight: 700; }
+
+    #batchCommandsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
 
     .clan-labs-missing-alert {
       padding: 6px 12px;
@@ -1642,7 +1654,7 @@
         <div style="font-size: 0.8rem; color: var(--text-secondary);">
           Commands grouped by total XP awarded. Run these in your Clan Labs bot Discord channel:
         </div>
-        <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+        <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 480px; overflow-y: auto; padding-right: 4px;">
           <!-- Dynamically populated commands -->
         </div>
       </div>
@@ -1950,6 +1962,18 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
+      }
+
+      function formatClanLabsCommand(cmdText) {
+        if (!cmdText) return "";
+        const escaped = escapeHtml(cmdText);
+        return escaped
+          .replace(/^\/xp\b/, '<span class="cmd-root">/xp</span>')
+          .replace(/\b(users:)/g, '<span class="cmd-param">$1</span>')
+          .replace(/&lt;@([^&>]+)&gt;/g, '<span class="cmd-id">&lt;@$1&gt;</span>')
+          .replace(/&lt;(MISSING_ID_[^&>]+)&gt;/g, '<span class="cmd-missing">&lt;$1&gt;</span>')
+          .replace(/\b(action:)(\w+)/g, '<span class="cmd-param">$1</span><span class="cmd-action">$2</span>')
+          .replace(/\b(amount:)(-?\d+)/g, '<span class="cmd-param">$1</span><span class="cmd-amount">$2</span>');
       }
 
       // Initialize Runtime Config from Server
@@ -2872,7 +2896,8 @@
 
             const codeBox = document.createElement("div");
             codeBox.className = "clan-labs-codebox";
-            codeBox.textContent = cmdText;
+            codeBox.dataset.rawCommand = cmdText;
+            codeBox.innerHTML = formatClanLabsCommand(cmdText);
 
             itemWrap.appendChild(header);
             itemWrap.appendChild(codeBox);
@@ -2889,7 +2914,7 @@
 
       els.copyAllBatchBtn.addEventListener("click", () => {
         const boxes = els.batchCommandsContainer.querySelectorAll(".clan-labs-codebox");
-        const allCmds = Array.from(boxes).map((b) => b.textContent.trim()).filter(Boolean);
+        const allCmds = Array.from(boxes).map((b) => b.dataset.rawCommand || b.textContent.trim()).filter(Boolean);
         if (allCmds.length === 0) {
           showToast("No commands to copy", "error");
           return;
