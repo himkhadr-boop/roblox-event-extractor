@@ -32,7 +32,7 @@ The API enables CORS for all origins (`*`) by default, allowing web applications
 | `GET` | [`/api/config`](#get-apiconfig) | Retrieve runtime clan and XP configuration | None | Public |
 | `POST` | [`/api/extract`](#post-apiextract) | Upload and transcribe screenshot images via Gemini Vision | `multipart/form-data` | Public |
 | `POST` | [`/api/verify_user`](#post-apiverify_user) | Verify a Roblox user and clan membership | `application/json` | Public |
-| `POST` | [`/api/calculate_xp`](#post-apicalculate_xp) | Compute XP, leaderboard, and Clan Labs bot commands | `application/json` | Public |
+| `POST` | [`/api/calculate_xp`](#post-apicalculate_xp) | Compute XP, leaderboard, and Winslow Accord bot slash commands | `application/json` | Public |
 | `GET` | [`/api/discord_ids`](#get-apidiscord_ids) | Retrieve all persistent Roblox-to-Discord mappings | None | Public |
 | `POST` | [`/api/discord_ids`](#post-apidiscord_ids) | Create, update, or remove Roblox-to-Discord mappings | `application/json` | Public |
 
@@ -261,11 +261,11 @@ curl -X POST "https://roblox-event-extractor.onrender.com/api/verify_user" \
 ### `POST /api/calculate_xp`
 
 #### Description
-Computes aggregated match statistics, attendance records, and total XP across multiple matches or rounds. Generates three ready-to-use exports:
+Computes aggregated match statistics, attendance records, and total XP across multiple matches or rounds. Generates ready-to-use exports:
 1. An ordered **leaderboard** (sorted by total XP descending, then alphabetically).
 2. Clean **Discord-formatted summary text**.
 3. A standardized **CSV export** of all player metrics.
-4. Batch-optimized **Clan Labs slash commands** (`/xp users:<@ID>... action:Add amount:<XP>`) grouped by XP tier to prevent bot rate-limiting.
+4. Batch-optimized **Winslow Accord custom bot slash commands** (`/xp-add target:<targets> amount:<amount>`) grouped by XP tier (returned via `bot_commands` and legacy alias `clan_labs_commands`).
 
 #### Request
 - **Content-Type**: `application/json`
@@ -368,7 +368,8 @@ Computes aggregated match statistics, attendance records, and total XP across mu
     ],
     "discord_text": "Chaotlc: 15 XP\nValkyrie: 10 XP",
     "csv_text": "Username,Total_XP,Events_Attended,Wins,Losses,Total_Kills,Total_Damage,Total_Heals,Total_Caps\nChaotlc,15,2,1,1,32,4250,200,2\nValkyrie,10,1,1,0,12,1900,450,1",
-    "clan_labs_commands": "/xp users:<@249827498172938240> action:Add amount:15\n/xp users:<@391829381928374619> action:Add amount:10",
+    "bot_commands": "/xp-add target:<@249827498172938240> amount:15\n/xp-add target:<@391829381928374619> amount:10",
+    "clan_labs_commands": "/xp-add target:<@249827498172938240> amount:15\n/xp-add target:<@391829381928374619> amount:10",
     "summary": {
       "total_events": 2,
       "unique_players": 2,
@@ -610,7 +611,8 @@ interface CalculateXPResponse {
   leaderboard: LeaderboardEntry[];
   discord_text: string;           // Formatted "Username: <XP> XP" plain text
   csv_text: string;               // Full CSV string formatted for spreadsheet import
-  clan_labs_commands: string;     // Bot slash commands grouped by XP amount
+  bot_commands: string;           // Winslow Accord custom bot slash commands (/xp-add target:<targets> amount:<amount>)
+  clan_labs_commands: string;     // Legacy alias for bot_commands (/xp-add target:<targets> amount:<amount>)
   summary: {
     total_events: number;         // Count of events processed
     unique_players: number;       // Count of distinct participants
@@ -619,17 +621,16 @@ interface CalculateXPResponse {
 }
 ```
 
-### `ClanLabsCommand` Format
-The Clan Labs bot uses slash commands to assign clan XP. To prevent hitting Discord rate limits (typically 5 requests per 5 seconds per channel), commands are consolidated by XP value:
+### Winslow Accord Bot Command Format (`/xp-add`)
+The Winslow Accord custom bot uses slash commands to assign clan XP using the `/xp-add target:<targets> amount:<amount>` syntax. Commands are consolidated and grouped by XP value descending:
 
 ```text
-/xp users:<@249827498172938240> <@391829381928374619> action:Add amount:10
+/xp-add target:<@249827498172938240> player2 amount:15
 ```
 
-If a verified player lacks a mapped Discord ID, the command substitutes `[MISSING_ID:<username>]` to alert the operator:
-```text
-/xp users:<@249827498172938240> [MISSING_ID:NewRecruit42] action:Add amount:10
-```
+- **Target Resolution Rule**: For each player, the engine uses their Discord snowflake mention (`<@ID>`) if mapped, or seamlessly falls back to their Roblox username if unmapped (e.g. `player2`). No manual placeholders (such as `[MISSING_ID:...]`) are used.
+- **Command Batching & Grouping**: All players awarded an identical XP total are merged into a single command with space-separated targets in the `target:` argument.
+- **Backwards Compatibility**: The response payload includes both `bot_commands` and `clan_labs_commands` (legacy key containing the identical string) to guarantee backwards compatibility with existing clients.
 
 ---
 
@@ -700,9 +701,9 @@ sequenceDiagram
 
     Officer->>Officer: Review & toggle win/loss for each round
     Officer->>API: POST /api/calculate_xp (events list)
-    API-->>Officer: Return leaderboard, CSV, and Clan Labs commands
+    API-->>Officer: Return leaderboard, CSV, and bot commands
 
-    Officer->>Officer: Copy Clan Labs /xp command into Discord
+    Officer->>Officer: Copy Winslow bot /xp-add command into Discord
 ```
 
 ---

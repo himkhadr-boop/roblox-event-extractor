@@ -16,7 +16,7 @@
   3. **Roster Verification**: Verify player membership against the official Winslow Accord Roblox group.
   4. **XP Accumulation**: Aggregate points across multiple matches or rounds with win/loss multipliers and manual adjustments.
   5. **Discord Identity Mapping**: Persist and associate Roblox usernames with Discord snowflake IDs.
-  6. **Clan Labs Bot Dispatch**: Format aggregated XP gains directly into copy-pasteable Clan Labs Discord slash commands.
+  6. **Winslow Bot Dispatch**: Format aggregated XP gains directly into copy-pasteable Winslow Accord custom bot slash commands (`/xp-add`).
 
 ---
 
@@ -32,14 +32,14 @@ All agents and contributors must preserve the following system invariants:
 | **Gemini Model** | `gemini-2.5-flash` | `gemini_vision.py` |
 | **Dual Gemini API Keys** | Comma-separated | Automatic failover & round-robin fallback on HTTP 429 / quota limit |
 | **Discord Store Path** | `discord_mappings.json` | Server-side, thread-safe read/write via `discord_store.py` (`threading.Lock`) |
-| **Clan Labs Command Format**| `/xp users:<@ID1> <@ID2> action:Add amount:X` | Valid Clan Labs bot slash syntax; never alter parameter names or case |
+| **Winslow Bot Command Format** | `/xp-add target:<@ID1> <RobloxUser2> amount:X` | Valid Winslow Accord bot slash syntax; targets Discord mention (`<@ID>`) if mapped, or Roblox username if unmapped. Multi-target space-separated |
 
-### Clan Labs Bot Command Syntax Standard
-Clan Labs requires users formatted as space-separated Discord mentions:
+### Winslow Bot Command Syntax Standard (`/xp-add`)
+Winslow Accord's custom bot uses the `/xp-add` command syntax with space-separated targets:
 ```text
-/xp users:<@123456789012345678> <@234567890123456789> action:Add amount:10
+/xp-add target:<@123456789012345678> behbeh1163 amount:10
 ```
-- If a verified member lacks a Discord mapping, display their Roblox username in a separate warning queue for manual tagging.
+- **Target Resolution Rule**: For each player, use their Discord snowflake mention (`<@ID>`) if mapped, or seamlessly fall back to their Roblox username if unmapped (no blocking or manual placeholders).
 - Respect Discord's 2000-character message limit by auto-chunking command batches if player counts are large.
 
 ---
@@ -52,7 +52,7 @@ roblox-event-extractor/
 ├── config.py               # Central environment variable loading (.env) and configuration constants
 ├── gemini_vision.py        # Gemini 2.5 Flash vision client, structured OCR prompt, key failover
 ├── roblox_verifier.py      # Roblox Open Cloud / Web API group verification with TTL caching
-├── xp_engine.py            # Event aggregation, win/loss math, Clan Labs syntax formatting
+├── xp_engine.py            # Event aggregation, win/loss math, Winslow bot slash syntax formatting
 ├── discord_store.py        # Thread-safe persistent JSON storage for Roblox <-> Discord mappings
 ├── discord_mappings.json   # Persistent key-value store ({ "RobloxUsernameLower": "DiscordSnowflake" })
 ├── static/                 # Frontend assets (Vanilla HTML5 / Modern CSS / ES6 JavaScript)

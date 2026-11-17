@@ -29,12 +29,12 @@ However, logging matches manually presents severe operational bottlenecks:
    - Tight letter kerning and ligature collapses result in frequent character misinterpretations, such as `cl` appearing as `d` or `di` appearing as `cl` (e.g., `flanked` transcribed as `flankecl` or `Flankedi`).
    - Similar ambiguities occur with `0` vs. `O` and `rn` vs. `m` (e.g., `burn` vs. `bum`).
 
-3. **Tedious & High-Stakes Clan Labs XP Assignment**:
-   - Clan progression is managed via the **Clan Labs Discord bot**, which requires specific slash commands matching Discord user snowflake IDs:
+3. **Tedious & High-Stakes Clan Bot XP Assignment**:
+   - Clan progression is managed via the Winslow Accord custom Discord bot, which requires slash commands targeting space-separated Discord user snowflakes or Roblox usernames:
      ```text
-     /xp users:<@314159265358979323> <@271828182845904523> action:Add amount:10
+     /xp-add target:<@123456789012345678> behbeh1163 amount:10
      ```
-   - Manually looking up 10 to 40 individual Discord IDs, grouping players by XP tiers (Wins vs. Losses), and typing syntax-sensitive commands is slow, fatiguing, and prone to miscrediting or skipping members.
+   - Manually looking up 10 to 40 individual Discord IDs or Roblox usernames, grouping players by XP tiers (Wins vs. Losses), and typing syntax-sensitive commands is slow, fatiguing, and prone to miscrediting or skipping members.
 
 ---
 
@@ -55,7 +55,7 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 [ Dynamic Multi-Match XP Engine ] ── (+10 Win / +5 Loss + Attendance Deduplication)
          │
          ▼
-[ Clan Labs Discord Generator & Shared Storage ] ── (discord_mappings.json)
+[ Winslow Bot Command Generator & Shared Storage ] ── (discord_mappings.json)
          │
          ▼
 [ Linear/Vercel Matte Dark Web UI ]
@@ -80,10 +80,14 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 - Handles multi-screenshot uploads across multi-round scrims or multi-map operations.
 - Enforces **attendance deduplication**, ensuring that players who participate across multiple rounds have their total statistics accumulated while receiving unified, consolidated XP awards.
 
-### 3.4 Grouped Clan Labs Command Generator
+### 3.4 Grouped Winslow Bot Command Generator
 - Organizes verified players into consolidated command blocks segmented by award tier (`amount:10`, `amount:5`).
-- Converts recognized Roblox usernames into their corresponding Discord snowflake mentions (`<@ID>`).
-- Features **Missing ID Alerts**: Unmapped players are clearly flagged with `[MISSING_ID:username]` placeholders, prompting officers to map their Discord IDs directly in the UI with a single click.
+- Generates Winslow Accord custom bot slash syntax:
+  ```text
+  /xp-add target:<@123456789012345678> behbeh1163 amount:10
+  ```
+- **Target Resolution Rule**: Resolves each player to their Discord snowflake mention (`<@ID>`) if mapped in `discord_mappings.json`, or seamlessly falls back to their Roblox username if unmapped (no manual placeholders or blockers).
+- Automatically chunks player targets to respect Discord's 2,000-character message limit during large clan events.
 
 ### 3.5 Shared Server-Side Discord ID Mapping Storage
 - Houses a persistent, thread-safe JSON datastore (`discord_mappings.json`) linking Roblox accounts to Discord IDs.
@@ -92,7 +96,7 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 ### 3.6 Linear / Vercel-Inspired Matte Dark UI
 - Designed with a clean, high-contrast matte dark obsidian aesthetic (`#0c0d0e`).
 - Real-time inline editing for match scores, player stats, and player affiliations.
-- One-click copy buttons for instant Clan Labs slash commands, formatted Discord match reports, and CSV exports for spreadsheet archiving.
+- One-click copy buttons for instant Winslow bot `/xp-add` slash commands, formatted Discord match reports, and CSV exports for spreadsheet archiving.
 
 ---
 
@@ -102,7 +106,7 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 | :--- | :--- | :--- | :--- |
 | **Logging Time per Scrim** | 15 &ndash; 25 minutes of manual transcription and ID lookup | **< 30 seconds** (instant batch upload and copy-paste) | **> 95% reduction in officer administrative time** |
 | **OCR & Transcript Accuracy** | High error rate due to death screens, kerning traps (`SAVlO_R`, `flankecl`) | **Near 100% resolution** via Gemini vision + roster-constrained heuristics | **Zero missed or incorrectly credited attendance** |
-| **Command Formatting Friction** | Manual slash command typing with frequent Discord syntax errors | **100% syntactically valid Clan Labs commands** grouped by XP tier | **Zero failed bot command executions** |
+| **Command Formatting Friction** | Manual slash command typing with frequent Discord syntax errors | **100% syntactically valid Winslow bot `/xp-add` commands** grouped by XP tier | **Zero failed bot command executions** |
 | **ID Mapping Overhead** | Fragmented officer notes or repetitive manual Discord searches | **Shared server-side database** updated once, preserved forever | **Zero-config multi-officer synchronization** |
 
 ---
@@ -113,6 +117,6 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 - **Configuration & Key Pool**: [`config.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/config.py)
 - **Gemini Vision Engine**: [`gemini_vision.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/gemini_vision.py)
 - **Roblox Clan Verifier**: [`roblox_verifier.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/roblox_verifier.py)
-- **XP Calculation & Clan Labs Formatting**: [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py)
+- **XP Calculation & Winslow Bot Formatting**: [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py)
 - **Persistent Discord Mapping Store**: [`discord_store.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/discord_store.py)
 - **Frontend Dashboard**: [`static/index.html`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/static/index.html)

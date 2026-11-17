@@ -7,7 +7,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![Roblox API](https://img.shields.io/badge/Roblox%20API-Verified%20Roster-E2231A?style=for-the-badge&logo=roblox&logoColor=white)](https://groups.roblox.com/)
 
-A high-performance, automated attendance and XP tracking engine built for **Winslow Accord** Roblox operations. The engine ingests post-match leaderboard screenshots (even low-contrast, blurred, or occluded captures), extracts in-game player statistics via Google Gemini 2.5 Flash multimodal vision, cross-verifies usernames against official Roblox group rosters with disambiguation heuristics, computes multi-match XP tallies, and produces ready-to-paste **Clan Labs** Discord slash commands.
+A high-performance, automated attendance and XP tracking engine built for **Winslow Accord** Roblox operations. The engine ingests post-match leaderboard screenshots (even low-contrast, blurred, or occluded captures), extracts in-game player statistics via Google Gemini 2.5 Flash multimodal vision, cross-verifies usernames against official Roblox group rosters with disambiguation heuristics, computes multi-match XP tallies, and produces ready-to-paste **Winslow Bot** (`/xp-add`) Discord slash commands.
 
 ---
 
@@ -33,14 +33,14 @@ A high-performance, automated attendance and XP tracking engine built for **Wins
 - **Attendance Deduplication**: Players participating across multiple rounds receive cumulative attendance XP while ensuring single-award integrity per discrete event.
 - **Comprehensive Match Analytics**: Aggregates total kills, damage, heals, and flag/terminal captures across all matches with automatic rank ordering.
 
-### 4. Clan Labs Slash Command Generator
-- **Instant Discord Command Formatting**: Formats verified rosters into native Clan Labs bot syntax:
+### 4. Winslow Bot Slash Command Generator
+- **Instant Discord Command Formatting**: Formats verified rosters directly into Winslow Accord custom bot slash command syntax:
   ```text
-  /xp users:<@314159265358979323> <@271828182845904523> action:Add amount:10
-  /xp users:<@141421356237309504> action:Add amount:5
+  /xp-add target:<@123456789012345678> behbeh1163 amount:10
+  /xp-add target:<@987654321098765432> amount:5
   ```
-- **Batching by XP Tiers**: Automatically batches users by identical XP awards to minimize bot invocation limits.
-- **Missing Discord ID Alerts**: Generates explicit placeholders (e.g. `[MISSING_ID:player_username]`) to clearly signal unlinked users needing mapping.
+- **Target Resolution**: Uses Discord snowflake mentions (`<@ID>`) for mapped players, or seamlessly falls back to their Roblox username for unmapped players (multi-target space-separated).
+- **Batching & Discord Limit Chunking**: Automatically groups targets by XP award tiers and chunks command batches to strictly stay within Discord's 2,000-character message limit.
 
 ### 5. Persistent Roblox-to-Discord Mapping Store
 - **Centralized Mapping Cache**: Stores verified mappings between Roblox usernames and Discord snowflake IDs (`discord_mappings.json`).
@@ -49,8 +49,8 @@ A high-performance, automated attendance and XP tracking engine built for **Wins
 
 ### 6. Hand-Crafted Linear/Vercel Matte Dark Interface
 - **Modern Aesthetic**: Deep matte obsidian theme with subtle micro-borders, clean typography, and responsive controls.
-- **Live Interactive Review**: Edit transcribed stats, toggle Win/Loss status per match, remap unmatched usernames, and preview Discord text or Clan Labs commands in real time.
-- **One-Click Exports**: Copy Clan Labs commands, plain Discord text leaderboards, or download comma-separated CSV spreadsheets for clan records.
+- **Live Interactive Review**: Edit transcribed stats, toggle Win/Loss status per match, remap unmatched usernames, and preview Discord text or Winslow Bot slash commands in real time.
+- **One-Click Exports**: Copy Winslow Bot slash commands, plain Discord text leaderboards, or download comma-separated CSV spreadsheets for clan records.
 
 ---
 
@@ -62,7 +62,7 @@ roblox-event-extractor/
 ├── config.py                # Environment variable loader, API key pool, clan defaults
 ├── gemini_vision.py         # Gemini 2.5 Flash multimodal vision engine & extraction prompts
 ├── roblox_verifier.py       # Roblox API client, roster caching & OCR disambiguation
-├── xp_engine.py             # Attendance tracking, multi-event XP tally, Clan Labs generator
+├── xp_engine.py             # Attendance tracking, multi-event XP tally, Winslow Bot generator
 ├── discord_store.py         # Thread-safe persistent JSON store for Roblox <-> Discord IDs
 ├── discord_mappings.json    # Local/cloud persistent Discord mapping database
 ├── render.yaml              # Render.com Blueprint configuration for 1-click cloud deploy
@@ -80,7 +80,7 @@ roblox-event-extractor/
 | [`config.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/config.py) | **Configuration Manager** | Loads `.env` settings, manages API key arrays for load distribution, and sets default group parameters (`DEFAULT_CLAN_GROUP_ID=825966682`). |
 | [`gemini_vision.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/gemini_vision.py) | **Vision Engine** | Sends base64-encoded screenshot buffers to Google Gemini 2.5 Flash with strict JSON schema definitions for accurate roster and stat extraction. |
 | [`roblox_verifier.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/roblox_verifier.py) | **Roster Verification** | Communicates with `groups.roblox.com` and `users.roblox.com`, utilizing fuzzy and algorithmic substitutions (`SAVlO_R`, `flankecl`) to reconcile OCR typos against clan rosters. |
-| [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py) | **XP & Command Engine** | Accumulates match stats, deduplicates player presence across events, calculates XP rewards, and formats Clan Labs slash commands and CSV output. |
+| [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py) | **XP & Command Engine** | Accumulates match stats, deduplicates player presence across events, calculates XP rewards, and formats Winslow Bot (`/xp-add`) slash commands and CSV output. |
 | [`discord_store.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/discord_store.py) | **Persistence Store** | Thread-safe manager for `discord_mappings.json`, storing normalized Roblox-to-Discord ID pairs for automated bot mention creation. |
 | [`static/index.html`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/static/index.html) | **Web Interface** | Zero-dependency, sleek single-page frontend with drag-and-drop file ingestion, editable match tables, command preview, and instant clipboard utilities. |
 | [`render.yaml`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/render.yaml) | **Cloud Blueprint** | Declarative deployment specification defining build steps, start commands, and environment variable bindings on Render. |
@@ -225,7 +225,8 @@ If you prefer hosting the extractor on a local machine with a public URL:
       "leaderboard": [...],
       "discord_text": "...",
       "csv_text": "...",
-      "clan_labs_commands": "/xp users:<@ID> action:Add amount:10\n...",
+      "bot_commands": "/xp-add target:<@123456789012345678> behbeh1163 amount:10\n...",
+      "clan_labs_commands": "/xp-add target:<@123456789012345678> behbeh1163 amount:10\n...",
       "summary": { "total_events": 1, "unique_players": 12, "total_xp_awarded": 110 }
     }
     ```
@@ -250,14 +251,14 @@ flowchart TD
     C --> D["🔍 Roblox Group Verification<br/>(Winslow Accord Group 825966682 + Disambiguation)"]
     D --> E["🆔 Discord ID Auto-Link<br/>(From persistent discord_mappings.json)"]
     E --> F["⚡ Dynamic Multi-Match XP Calculation<br/>(Win = 10 XP, Loss = 5 XP)"]
-    F --> G["📋 Copy Clan Labs Slash Commands<br/>('/xp users:<@ID1> <@ID2> action:Add amount:X')"]
+    F --> G["📋 Copy Winslow Bot Slash Commands<br/>('/xp-add target:... amount:...')"]
     G --> H["💬 Paste in Discord Ops Channel<br/>(Instantly award clan XP)"]
 ```
 
 1. **Capture**: Take screenshot(s) of the final match scoreboard in Roblox.
 2. **Upload**: Drop the image(s) onto the web interface.
 3. **Verify**: Inspect extracted players. Any unlinked Discord IDs can be populated with a single click.
-4. **Export**: Click **Copy Clan Labs Command** to copy the formatted `/xp` slash command.
+4. **Export**: Click **Copy Winslow Bot Command** to copy the formatted `/xp-add` slash command.
 5. **Award**: Paste directly into your clan Discord operations channel.
 
 ---

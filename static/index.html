@@ -1521,7 +1521,7 @@
             Match Screenshots
           </div>
         </div>
-        <span class="card-subtitle">Upload match scoreboards to extract rosters and calculate Clan Labs XP</span>
+        <span class="card-subtitle">Upload match scoreboards to extract rosters and calculate XP</span>
       </div>
       <div class="card-body">
         <div class="dropzone-container" id="uploadDropZone">
@@ -1564,7 +1564,7 @@
             Matches (<span id="eventsCountBadge">0</span>)
           </div>
         </div>
-        <span class="card-subtitle">Review team rosters, set match outcome, and copy Clan Labs command</span>
+        <span class="card-subtitle">Review team rosters, set match outcome, and copy Winslow Bot command</span>
       </div>
       <div class="card-body">
         <div class="events-stack" id="eventsContainer">
@@ -1582,7 +1582,7 @@
           </div>
         </div>
         <div class="navbar-actions">
-          <button id="openBatchCommandsBtn" class="btn btn-secondary btn-sm" title="Generate Clan Labs commands grouped by XP">
+          <button id="openBatchCommandsBtn" class="btn btn-secondary btn-sm" title="Generate Bot slash commands grouped by XP">
             Batch Commands
           </button>
           <button id="copyDiscordBtn" class="btn btn-secondary btn-sm" title="Copy clean Discord formatted attendance list">
@@ -1707,11 +1707,11 @@
     </div>
   </div>
 
-  <!-- Batch Clan Labs Commands Modal -->
+  <!-- Batch Bot Slash Commands Modal -->
   <div class="modal-backdrop" id="batchCommandsModal">
     <div class="modal-dialog" style="max-width: 620px;">
       <div class="modal-header">
-        <div class="modal-title">Batch Clan Labs Commands</div>
+        <div class="modal-title">Batch Bot Slash Commands</div>
         <button class="modal-close" id="closeBatchCommandsBtn" title="Close">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1721,7 +1721,7 @@
       </div>
       <div class="modal-body">
         <div style="font-size: 12px; color: var(--text-secondary);">
-          Commands grouped by total XP awarded. Run these in your Clan Labs bot Discord channel:
+          Commands grouped by total XP awarded. Run these in your Discord channel:
         </div>
         <div id="batchCommandsContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 4px;">
           <!-- Dynamically populated commands -->
@@ -1739,7 +1739,7 @@
 
   <!-- Footer -->
   <footer>
-    Winslow Accord &bull; Clan Event Attendance &bull; Clan Labs XP Engine
+    Winslow Accord &bull; Clan Event Attendance &bull; Winslow Bot XP Engine
   </footer>
 
   <!-- Frontend Logic -->
@@ -1951,7 +1951,7 @@
           });
         });
 
-        // Recalculate Clan Labs slash command live
+        // Recalculate Winslow Bot slash command live
         updateAllClanLabsBoxes();
       }
 
@@ -2040,7 +2040,9 @@
         if (!cmdText) return "";
         const escaped = escapeHtml(cmdText);
         return escaped
+          .replace(/^\/xp-add\b/, '<span class="cmd-root">/xp-add</span>')
           .replace(/^\/xp\b/, '<span class="cmd-root">/xp</span>')
+          .replace(/\b(target:)/g, '<span class="cmd-param">$1</span>')
           .replace(/\b(users:)/g, '<span class="cmd-param">$1</span>')
           .replace(/&lt;@([^&>]+)&gt;/g, '<span class="cmd-id">&lt;@$1&gt;</span>')
           .replace(/&lt;(MISSING_ID_[^&>]+)&gt;/g, '<span class="cmd-missing">&lt;$1&gt;</span>')
@@ -2631,7 +2633,7 @@
 
           rosterWrap.appendChild(addPlayerBar);
 
-          // Clan Labs Slash Command Box
+          // Winslow Bot Slash Command Box
           const clanLabsBox = renderClanLabsBoxForEvent(evt, players);
           rosterWrap.appendChild(clanLabsBox);
 
@@ -2640,7 +2642,7 @@
         });
       }
 
-      // Generate Clan Labs Slash Command Box for single event
+      // Generate Winslow Bot Slash Command Box for single event
       function renderClanLabsBoxForEvent(evt, players) {
         const wrap = document.createElement("div");
         wrap.className = "clan-labs-section";
@@ -2679,20 +2681,21 @@
           });
 
           missingUsers.forEach((m) => {
-            userTokens.push(`<MISSING_ID_${m.name}>`);
-            userHtmlTokens.push(`<span class="cmd-missing">&lt;MISSING_ID_${escapeHtml(m.name)}&gt;</span>`);
+            userTokens.push(m.name);
+            userHtmlTokens.push(`<span class="cmd-missing">${escapeHtml(m.name)}</span>`);
           });
 
-          rawCommand = `/xp users:${userTokens.join(" ")} action:Add amount:${xpAmount}`;
-          formattedHtml = `<span class="cmd-root">/xp</span> <span class="cmd-param">users:</span>${userHtmlTokens.join(" ")} <span class="cmd-param">action:</span><span class="cmd-action">Add</span> <span class="cmd-param">amount:</span><span class="cmd-amount">${xpAmount}</span>`;
+          rawCommand = `/xp-add target:${userTokens.join(" ")} amount:${xpAmount}`;
+          formattedHtml = `<span class="cmd-root">/xp-add</span> <span class="cmd-param">target:</span>${userHtmlTokens.join(" ")} <span class="cmd-param">amount:</span><span class="cmd-amount">${xpAmount}</span>`;
         }
 
+        const totalAttendees = validUsers.length + missingUsers.length;
         const header = document.createElement("div");
         header.className = "clan-labs-header";
         header.innerHTML = `
           <div class="clan-labs-title-wrap">
-            <span class="clan-labs-title">Clan Labs Slash Command</span>
-            <span class="clan-labs-badge">${validUsers.length} Attendee${validUsers.length === 1 ? '' : 's'}</span>
+            <span class="clan-labs-title">Winslow Bot Slash Command</span>
+            <span class="clan-labs-badge">${totalAttendees} Attendee${totalAttendees === 1 ? '' : 's'}</span>
           </div>
           <button class="btn btn-secondary btn-sm copy-cmd-btn" title="Copy command for Discord">
             Copy Command
@@ -2700,7 +2703,7 @@
         `;
 
         header.querySelector(".copy-cmd-btn").addEventListener("click", () => {
-          copyToClipboard(rawCommand, "Clan Labs slash command copied to clipboard");
+          copyToClipboard(rawCommand, "Winslow Bot slash command copied to clipboard");
         });
 
         const codeBox = document.createElement("div");
@@ -2915,10 +2918,10 @@
         });
       }
 
-      // Batch Clan Labs Commands Generator Modal
+      // Batch Bot Slash Commands Generator Modal
       els.openBatchCommandsBtn.addEventListener("click", () => {
         if (!state.calculatedXPResult || !state.calculatedXPResult.leaderboard || !state.calculatedXPResult.leaderboard.length) {
-          showToast("No attendance data to generate Clan Labs commands", "error");
+          showToast("No attendance data to generate Bot slash commands", "error");
           return;
         }
 
@@ -2952,8 +2955,8 @@
         } else {
           amounts.forEach((amt) => {
             const list = groups[amt];
-            const tokens = list.map((item) => item.id ? `<@${item.id}>` : `<MISSING_ID_${item.name}>`);
-            const cmdText = `/xp users:${tokens.join(" ")} action:Add amount:${amt}`;
+            const tokens = list.map((item) => item.id ? `<@${item.id}>` : item.name);
+            const cmdText = `/xp-add target:${tokens.join(" ")} amount:${amt}`;
 
             const itemWrap = document.createElement("div");
             itemWrap.className = "clan-labs-section";
@@ -2997,7 +3000,7 @@
           showToast("No commands to copy", "error");
           return;
         }
-        copyToClipboard(allCmds.join("\n\n"), "All Clan Labs commands copied to clipboard");
+        copyToClipboard(allCmds.join("\n\n"), "All Winslow Bot commands copied to clipboard");
       });
 
       // Standard Exports

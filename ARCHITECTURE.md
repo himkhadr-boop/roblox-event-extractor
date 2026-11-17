@@ -11,7 +11,7 @@ The **Roblox Event Extractor & Attendance Engine** is a specialized, production-
 1. **Severe OCR Degradation**: Leaderboard screenshots captured in the heat of battle suffer from low contrast, non-standard typography, low resolution, motion blur, and opaque/translucent overlay banners (such as the red **"YOU DIED"** respawn screen).
 2. **Sans-Serif Visual Ambiguities**: Modern typography creates indistinguishable letterforms (e.g., uppercase `I` vs. lowercase `l`, `0` vs. `O`, `cl` vs. `d`, `rn` vs. `m`), leading naive OCR tools to fail username identification against Roblox databases.
 3. **Multi-Match Operational Overhead**: Officers managing multi-round scrims or operations manually transcribe scores, cross-check rosters, calculate attendance XP, and generate Discord bot commands—a process prone to human error and bot rate-limit exhaustion.
-4. **Discord Identity Disconnect**: Roblox usernames rarely match Discord handles; Clan Labs bot slash commands require Discord user snowflakes (`<@ID>`) to credit accounts.
+4. **Discord Identity Disconnect**: Roblox usernames rarely match Discord handles; Winslow Accord's custom bot slash commands (`/xp-add target:... amount:...`) accept Discord user snowflakes (`<@ID>`) or Roblox usernames. Persisting mappings ensures members receive Discord notifications and credits while seamlessly falling back to Roblox usernames for unmapped players.
 
 ### Architectural Tenets
 - **Deterministic Schema Enforcement**: Multimodal vision requests to Google Gemini 2.5 Flash strictly enforce typed JSON schemas, eliminating hallucinated output or formatting mismatches.
@@ -117,7 +117,7 @@ sequenceDiagram
     UI->>App: POST /api/calculate_xp (events, win_xp, loss_xp)
     App->>Engine: calculate_xp(events, win_xp, loss_xp)
     Engine->>Engine: Deduplicate Attendance, Sum Stats, Batch Slash Commands
-    Engine-->>App: Aggregated Leaderboard, Clan Labs Commands, CSV
+    Engine-->>App: Aggregated Leaderboard, Winslow Bot Commands, CSV
     App-->>UI: Calculated Response
     UI-->>Officer: Live Preview & One-Click Copy buttons
 ```
@@ -276,9 +276,9 @@ Accumulation:
 - Player B: 2 Events (2W, 0L) = 20 XP
 - Player C: 2 Events (1W, 1L) = 15 XP
 
-Clan Labs Command Generation (Batched by XP):
-/xp users:<@B_ID> action:Add amount:20
-/xp users:<@A_ID> <@C_ID> action:Add amount:15
+Winslow Bot Command Generation (Batched by XP):
+/xp-add target:<@B_ID> amount:20
+/xp-add target:<@A_ID> <@C_ID> amount:15
 ```
 
 #### Event Deduplication & Integrity
@@ -292,22 +292,32 @@ for player in event_players:
 ```
 Attendance XP (`WIN_XP` or `LOSS_XP`) is applied once per match, while combat statistics (`kills`, `damage`, `heals`, `caps`) are summed across all rounds.
 
-#### Clan Labs Slash Command Batching
-Discord slash commands enforce length limitations and bot rate limits. Rather than issuing one slash command per player, `XPEngine` groups players by identical XP awards:
+#### Winslow Bot Slash Command Batching
+Discord slash commands enforce length limitations and bot rate limits. Rather than issuing one slash command per player, `XPEngine` groups players by identical XP awards using Winslow's custom bot syntax (`/xp-add target:... amount:...`):
 
 ```python
 xp_groups: Dict[int, List[str]] = {}
 for p in leaderboard:
-    xp_groups.setdefault(p["total_xp"], []).append(target_tag)
+    xp = p["total_xp"]
+    if xp <= 0:
+        continue
+    did = p.get("discord_id")
+    clean_id = str(did).strip().lstrip("<@!").rstrip(">") if did else ""
+    target = f"<@{clean_id}>" if clean_id else p["username"]
+    xp_groups.setdefault(xp, []).append(target)
 
-# Generates:
-# /xp users:<@111111111> <@222222222> action:Add amount:10
+# Generates space-separated targets batched by XP amount:
+# /xp-add target:<@111111111> <@222222222> behbeh1163 amount:10
 ```
-If a player lacks a mapped Discord snowflake ID, the engine outputs an alert tag:
-`[MISSING_ID:player_username]`, making missing entries immediately actionable for clan officers.
+
+##### Target Resolution Rules
+1. **Mapped Discord Identity**: For players with a persisted Discord snowflake ID, the target is formatted as a direct mention: `<@ID>`.
+2. **Unmapped Roblox Fallback**: For unmapped players, the target seamlessly falls back to their canonical Roblox username (e.g., `behbeh1163`). No blocking placeholders or missing-tag errors interrupt batch execution.
+3. **Space-Separated Targets**: All targets within the same XP tier are space-separated within the `target:` parameter.
+4. **Length & Auto-Chunking**: Splits command strings across multiple lines if targets approach Discord's 2000-character message limit.
 
 #### Export Formats
-- **Clan Labs Commands**: Batched Discord slash command blocks.
+- **Winslow Bot Commands**: Batched `/xp-add target:... amount:...` Discord slash command blocks grouped by XP descending (with legacy `clan_labs_commands` alias preserved).
 - **Discord Monospace Leaderboard**: Markdown code-block table sorted by Total XP descending, with win rates and combat totals.
 - **CSV Output**: Standard RFC 4180 comma-separated format containing canonical columns:
   `Rank, Username, Discord ID, Clan Role, Events Attended, Wins, Losses, Total XP, Kills, Damage, Heals, Caps`.
@@ -360,9 +370,9 @@ The web interface is implemented as a single-page, zero-dependency application f
 |  [Drag & Drop Screenshots Zone]                                                         |
 |  -------------------------------------------------------------------------------------  |
 |  [Events List / Scrim Review]               | [Calculated Outputs]                      |
-|  - Match 1: [Win/Loss] [Delete]             | Tabs: [Clan Labs Commands] [Discord] [CSV]|
+|  - Match 1: [Win/Loss] [Delete]             | Tabs: [Winslow Bot Commands] [Discord] [CSV]|
 |    Table: Player, Discord ID, K/D/A/Caps    | +---------------------------------------+ |
-|  - Match 2: [Win/Loss] [Delete]             | | /xp users:<@123> action:Add amount:10 | |
+|  - Match 2: [Win/Loss] [Delete]             | | /xp-add target:<@123> amount:10       | |
 |    Table: Player, Discord ID, K/D/A/Caps    | +---------------------------------------+ |
 |                                             | [Copy to Clipboard]  [Download CSV]      |
 +-----------------------------------------------------------------------------------------+
@@ -381,7 +391,7 @@ const state = {
   verifiedEvents: [],     // Events enriched with Roblox verification data
   discordMappings: {},    // Synchronized Roblox -> Discord snowflake cache
   xpConfig: { win: 10, loss: 5 },
-  activeTab: 'clanlabs',  // 'clanlabs' | 'discord' | 'csv' | 'leaderboard'
+  activeTab: 'bot_commands',  // 'bot_commands' (legacy 'clanlabs') | 'discord' | 'csv' | 'leaderboard'
   isExtracting: false,
   isCalculating: false
 };
@@ -453,7 +463,7 @@ services:
 | **Google Gemini API** | Per-minute RPM & RPD limits | **Round-robin key rotation** across multiple API keys with automatic failover upon receiving 429 errors. |
 | **Roblox Group API** | Rate-limited per IP on rapid calls | **Roster pre-fetching & cursor caching**: One initial paginated fetch caches the entire clan roster, eliminating repetitive per-player calls. |
 | **Roblox User API** | 100 usernames per POST chunk | **Batch chunking**: Unmatched players are batched into single HTTP POST requests of up to 100 usernames. |
-| **Discord Bot API** | Command invocation rate limits | **XP tier grouping**: Multiple users with identical XP are aggregated into a single `/xp users:<@ID1> <@ID2> ...` slash command. |
+| **Discord Bot API** | Command invocation rate limits | **XP tier grouping**: Multiple targets with identical XP are aggregated into a single `/xp-add target:<@ID1> <RobloxUser2> amount:X` slash command. |
 
 ### Network Timeout & Resilience
 - **Urllib & Requests Timeouts**: All upstream network operations specify explicit timeouts (60 seconds for Gemini Vision multimodal analysis, 10 seconds for Roblox API endpoints).
@@ -469,7 +479,7 @@ roblox-event-extractor/
 ├── config.py                # Environment configuration loader, key pool, clan defaults
 ├── gemini_vision.py         # Multimodal extraction engine, schema enforcement, key rotation
 ├── roblox_verifier.py       # Group roster caching, OCR variant generator, user verification
-├── xp_engine.py             # Event aggregation, attendance deduplication, Clan Labs commands
+├── xp_engine.py             # Event aggregation, attendance deduplication, Winslow Bot commands
 ├── discord_store.py         # Thread-safe persistent JSON store for Roblox <-> Discord mappings
 ├── discord_mappings.json    # Local/cloud persistent identity storage
 ├── static/

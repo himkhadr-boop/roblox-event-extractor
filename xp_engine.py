@@ -67,7 +67,8 @@ class XPEngine:
                 - leaderboard: list of player stat dicts sorted by total_xp desc, then username.lower() asc
                 - discord_text: formatted string suitable for Discord messages
                 - csv_text: formatted CSV string with standard headers
-                - clan_labs_commands: formatted Clan Labs /xp slash commands grouped by XP amount
+                - clan_labs_commands: formatted /xp-add slash commands (legacy key for backwards compatibility)
+                - bot_commands: formatted /xp-add slash commands grouped by XP amount descending
                 - summary: total_events, unique_players, total_xp_awarded
         """
         effective_win_xp = win_xp if win_xp is not None else self.win_xp
@@ -158,7 +159,7 @@ class XPEngine:
             )
         csv_text = "\n".join(csv_rows)
 
-        # Generate Clan Labs slash commands
+        # Generate custom bot slash commands (/xp-add target:... amount:...)
         xp_groups: Dict[int, List[str]] = {}
         for p in leaderboard:
             xp = p["total_xp"]
@@ -167,16 +168,16 @@ class XPEngine:
             did = p.get("discord_id")
             clean_id = str(did).strip().lstrip("<@!").rstrip(">") if did else ""
             if clean_id:
-                mention = f"<@{clean_id}>"
+                target = f"<@{clean_id}>"
             else:
-                mention = f"[MISSING_ID:{p['username']}]"
-            xp_groups.setdefault(xp, []).append(mention)
+                target = p["username"]
+            xp_groups.setdefault(xp, []).append(target)
 
-        clan_labs_lines = []
+        bot_lines = []
         for amount in sorted(xp_groups.keys(), reverse=True):
-            mentions_str = " ".join(xp_groups[amount])
-            clan_labs_lines.append(f"/xp users:{mentions_str} action:Add amount:{amount}")
-        clan_labs_commands = "\n".join(clan_labs_lines)
+            targets_str = " ".join(xp_groups[amount])
+            bot_lines.append(f"/xp-add target:{targets_str} amount:{amount}")
+        bot_commands = "\n".join(bot_lines)
 
         # Summary statistics
         total_xp_awarded = sum(p["total_xp"] for p in leaderboard)
@@ -190,7 +191,8 @@ class XPEngine:
             "leaderboard": leaderboard,
             "discord_text": discord_text,
             "csv_text": csv_text,
-            "clan_labs_commands": clan_labs_commands,
+            "clan_labs_commands": bot_commands,
+            "bot_commands": bot_commands,
             "summary": summary,
         }
 
@@ -298,13 +300,14 @@ if __name__ == "__main__":
     assert csv_lines[3] == "unverified_warrior,10,1,1,0,5,400,0,0"
     assert csv_lines[4] == "Albatross,5,1,0,1,12,950,0,2"
 
-    # Clan Labs command check on dummy_events (with missing IDs)
-    expected_clan_labs = (
-        "/xp users:[MISSING_ID:bonniebluesbeast] action:Add amount:15\n"
-        "/xp users:[MISSING_ID:flankecl] [MISSING_ID:unverified_warrior] action:Add amount:10\n"
-        "/xp users:[MISSING_ID:Albatross] action:Add amount:5"
+    # Bot command check on dummy_events (unmapped players fall back to username)
+    expected_bot_commands = (
+        "/xp-add target:bonniebluesbeast amount:15\n"
+        "/xp-add target:flankecl unverified_warrior amount:10\n"
+        "/xp-add target:Albatross amount:5"
     )
-    assert result["clan_labs_commands"] == expected_clan_labs, f"Unexpected clan_labs_commands:\n{result['clan_labs_commands']}"
+    assert result["bot_commands"] == expected_bot_commands, f"Unexpected bot_commands:\n{result['bot_commands']}"
+    assert result["clan_labs_commands"] == expected_bot_commands, f"Unexpected clan_labs_commands:\n{result['clan_labs_commands']}"
 
     # 6. Verify duplicate player in single event handling
     dup_event = [
@@ -331,9 +334,10 @@ if __name__ == "__main__":
     assert empty_res["discord_text"] == ""
     assert empty_res["csv_text"] == "Username,Total_XP,Events_Attended,Wins,Losses,Total_Kills,Total_Damage,Total_Heals,Total_Caps"
     assert empty_res["clan_labs_commands"] == ""
+    assert empty_res["bot_commands"] == ""
     assert empty_res["summary"] == {"total_events": 0, "unique_players": 0, "total_xp_awarded": 0}
 
-    # 8. Verify Clan Labs slash commands with Discord IDs and roles
+    # 8. Verify bot slash commands with Discord IDs, unmapped players, and roles
     clan_events = [
         {
             "event_id": "evt_clan",
@@ -350,14 +354,22 @@ if __name__ == "__main__":
                     "discord_id": "<@222>",
                     "clan_role": "Member",
                 },
+                {
+                    "username": "Player3",
+                    "clan_role": "Recruit",
+                },
             ],
         }
     ]
     clan_res = engine.calculate_xp(clan_events)
-    assert clan_res["clan_labs_commands"] == "/xp users:<@111> <@222> action:Add amount:10"
+    expected_clan_cmds = "/xp-add target:<@111> <@222> Player3 amount:10"
+    assert clan_res["bot_commands"] == expected_clan_cmds, f"Unexpected bot_commands:\n{clan_res['bot_commands']}"
+    assert clan_res["clan_labs_commands"] == expected_clan_cmds, f"Unexpected clan_labs_commands:\n{clan_res['clan_labs_commands']}"
     assert clan_res["leaderboard"][0]["discord_id"] == "111"
     assert clan_res["leaderboard"][0]["clan_role"] == "Officer"
     assert clan_res["leaderboard"][1]["discord_id"] == "<@222>"
     assert clan_res["leaderboard"][1]["clan_role"] == "Member"
+    assert clan_res["leaderboard"][2]["discord_id"] is None
+    assert clan_res["leaderboard"][2]["clan_role"] == "Recruit"
 
     print("All localized tests passed successfully!")
