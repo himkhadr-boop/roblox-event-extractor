@@ -473,6 +473,12 @@
       background: #121620;
     }
 
+    .dropzone-container.pulse-paste {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+      background: #121620;
+    }
+
     .dropzone-icon {
       width: 18px;
       height: 18px;
@@ -1531,8 +1537,8 @@
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <div class="dropzone-title">Drop match screenshots here or browse</div>
-          <div class="dropzone-hint">PNG, JPG up to 10MB</div>
+          <div class="dropzone-title">Drop match screenshots here, browse, or paste (Ctrl+V / K)</div>
+          <div class="dropzone-hint">PNG, JPG up to 10MB &bull; Direct clipboard paste supported</div>
         </div>
 
         <!-- Staged files grid -->
@@ -2186,6 +2192,102 @@
       els.clearStagedBtn.addEventListener("click", () => {
         state.stagedFiles = [];
         renderStagedFiles();
+      });
+
+      // Temporary visual glow/pulse on upload dropzone
+      function triggerDropZonePulse() {
+        if (els.uploadDropZone) {
+          els.uploadDropZone.classList.add("pulse-paste");
+          setTimeout(() => {
+            els.uploadDropZone.classList.remove("pulse-paste");
+          }, 1200);
+        }
+      }
+
+      // Window-level Clipboard Image Pasting (Ctrl+V)
+      window.addEventListener("paste", (e) => {
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items || !items.length) return;
+
+        const imageFiles = [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type && item.type.startsWith("image/")) {
+            const blob = item.getAsFile();
+            if (blob) {
+              const ext = (item.type.split("/")[1] || "png").replace("jpeg", "jpg");
+              const filename = `clipboard_${Date.now()}_${i + 1}.${ext}`;
+              const file = new File([blob], filename, {
+                type: item.type,
+                lastModified: Date.now(),
+              });
+              imageFiles.push(file);
+            }
+          }
+        }
+
+        if (imageFiles.length > 0) {
+          e.preventDefault();
+          handleFilesSelected(imageFiles);
+          triggerDropZonePulse();
+          showToast(
+            `Pasted ${imageFiles.length} image${imageFiles.length === 1 ? "" : "s"} from clipboard`,
+            "success"
+          );
+        }
+      });
+
+      // Keyboard shortcut 'k' / 'K' for clipboard image pasting
+      window.addEventListener("keydown", async (e) => {
+        if (e.key && e.key.toLowerCase() === "k") {
+          const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
+          const isInputActive =
+            activeTag === "input" ||
+            activeTag === "textarea" ||
+            (document.activeElement && document.activeElement.isContentEditable);
+
+          if (!isInputActive && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            e.preventDefault();
+            if (navigator.clipboard && navigator.clipboard.read) {
+              try {
+                const clipboardItems = await navigator.clipboard.read();
+                const imageFiles = [];
+                let itemIdx = 0;
+                for (const item of clipboardItems) {
+                  for (const type of item.types) {
+                    if (type.startsWith("image/")) {
+                      const blob = await item.getType(type);
+                      const ext = (type.split("/")[1] || "png").replace("jpeg", "jpg");
+                      itemIdx++;
+                      const filename = `clipboard_${Date.now()}_${itemIdx}.${ext}`;
+                      const file = new File([blob], filename, {
+                        type: type,
+                        lastModified: Date.now(),
+                      });
+                      imageFiles.push(file);
+                    }
+                  }
+                }
+
+                if (imageFiles.length > 0) {
+                  handleFilesSelected(imageFiles);
+                  triggerDropZonePulse();
+                  showToast(
+                    `Pasted ${imageFiles.length} image${imageFiles.length === 1 ? "" : "s"} from clipboard`,
+                    "success"
+                  );
+                } else {
+                  showToast("No image found in clipboard. Copy an image or screenshot first.", "info");
+                }
+              } catch (err) {
+                console.warn("Clipboard read error:", err);
+                showToast("Clipboard access denied or unsupported. Use Ctrl+V instead.", "info");
+              }
+            } else {
+              showToast("Direct clipboard reading not supported. Use Ctrl+V to paste.", "info");
+            }
+          }
+        }
       });
 
       // API: Extract Leaderboard Screenshots
