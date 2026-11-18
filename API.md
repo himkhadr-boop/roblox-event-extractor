@@ -713,7 +713,7 @@ sequenceDiagram
 ### Running Local Uvicorn Instance
 ```powershell
 # Navigate to project directory
-cd C:\Users\mokak\.gemini\antigravity\scratch\roblox-event-extractor
+cd path/to/roblox-event-extractor
 
 # Activate virtual environment (if applicable)
 # .\venv\Scripts\Activate.ps1

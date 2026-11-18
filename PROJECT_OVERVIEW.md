@@ -113,10 +113,10 @@ Winslow Accord Ops eliminates these hurdles through an integrated, multi-stage p
 
 ## 5. Architectural References
 
-- **Application Controller**: [`app.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/app.py)
-- **Configuration & Key Pool**: [`config.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/config.py)
-- **Gemini Vision Engine**: [`gemini_vision.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/gemini_vision.py)
-- **Roblox Clan Verifier**: [`roblox_verifier.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/roblox_verifier.py)
-- **XP Calculation & Winslow Bot Formatting**: [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py)
-- **Persistent Discord Mapping Store**: [`discord_store.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/discord_store.py)
-- **Frontend Dashboard**: [`static/index.html`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/static/index.html)
+- **Application Controller**: [`app.py`](./app.py)
+- **Configuration & Key Pool**: [`config.py`](./config.py)
+- **Gemini Vision Engine**: [`gemini_vision.py`](./gemini_vision.py)
+- **Roblox Clan Verifier**: [`roblox_verifier.py`](./roblox_verifier.py)
+- **XP Calculation & Winslow Bot Formatting**: [`xp_engine.py`](./xp_engine.py)
+- **Persistent Discord Mapping Store**: [`discord_store.py`](./discord_store.py)
+- **Frontend Dashboard**: [`static/index.html`](./static/index.html)

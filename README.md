@@ -76,14 +76,14 @@ roblox-event-extractor/
 
 | File | Role | Description |
 | :--- | :--- | :--- |
-| [`app.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/app.py) | **Application Controller** | Exposes REST endpoints (`/api/extract`, `/api/calculate_xp`, `/api/verify_user`, `/api/discord_ids`, `/api/config`, `/api/health`) and serves the static frontend. |
-| [`config.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/config.py) | **Configuration Manager** | Loads `.env` settings, manages API key arrays for load distribution, and sets default group parameters (`DEFAULT_CLAN_GROUP_ID=825966682`). |
-| [`gemini_vision.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/gemini_vision.py) | **Vision Engine** | Sends base64-encoded screenshot buffers to Google Gemini 2.5 Flash with strict JSON schema definitions for accurate roster and stat extraction. |
-| [`roblox_verifier.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/roblox_verifier.py) | **Roster Verification** | Communicates with `groups.roblox.com` and `users.roblox.com`, utilizing fuzzy and algorithmic substitutions (`SAVlO_R`, `flankecl`) to reconcile OCR typos against clan rosters. |
-| [`xp_engine.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/xp_engine.py) | **XP & Command Engine** | Accumulates match stats, deduplicates player presence across events, calculates XP rewards, and formats Winslow Bot (`/xp-add`) slash commands and CSV output. |
-| [`discord_store.py`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/discord_store.py) | **Persistence Store** | Thread-safe manager for `discord_mappings.json`, storing normalized Roblox-to-Discord ID pairs for automated bot mention creation. |
-| [`static/index.html`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/static/index.html) | **Web Interface** | Zero-dependency, sleek single-page frontend with drag-and-drop file ingestion, editable match tables, command preview, and instant clipboard utilities. |
-| [`render.yaml`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/render.yaml) | **Cloud Blueprint** | Declarative deployment specification defining build steps, start commands, and environment variable bindings on Render. |
+| [`app.py`](./app.py) | **Application Controller** | Exposes REST endpoints (`/api/extract`, `/api/calculate_xp`, `/api/verify_user`, `/api/discord_ids`, `/api/config`, `/api/health`) and serves the static frontend. |
+| [`config.py`](./config.py) | **Configuration Manager** | Loads `.env` settings, manages API key arrays for load distribution, and sets default group parameters (`DEFAULT_CLAN_GROUP_ID=825966682`). |
+| [`gemini_vision.py`](./gemini_vision.py) | **Vision Engine** | Sends base64-encoded screenshot buffers to Google Gemini 2.5 Flash with strict JSON schema definitions for accurate roster and stat extraction. |
+| [`roblox_verifier.py`](./roblox_verifier.py) | **Roster Verification** | Communicates with `groups.roblox.com` and `users.roblox.com`, utilizing fuzzy and algorithmic substitutions (`SAVlO_R`, `flankecl`) to reconcile OCR typos against clan rosters. |
+| [`xp_engine.py`](./xp_engine.py) | **XP & Command Engine** | Accumulates match stats, deduplicates player presence across events, calculates XP rewards, and formats Winslow Bot (`/xp-add`) slash commands and CSV output. |
+| [`discord_store.py`](./discord_store.py) | **Persistence Store** | Thread-safe manager for `discord_mappings.json`, storing normalized Roblox-to-Discord ID pairs for automated bot mention creation. |
+| [`static/index.html`](./static/index.html) | **Web Interface** | Zero-dependency, sleek single-page frontend with drag-and-drop file ingestion, editable match tables, command preview, and instant clipboard utilities. |
+| [`render.yaml`](./render.yaml) | **Cloud Blueprint** | Declarative deployment specification defining build steps, start commands, and environment variable bindings on Render. |
 
 ---
 
@@ -147,7 +147,7 @@ roblox-event-extractor/
 
 ### Option A: Free Cloud Deployment on Render (Recommended)
 
-The repository includes a ready-to-use [`render.yaml`](file:///C:/Users/mokak/.gemini/antigravity/scratch/roblox-event-extractor/render.yaml) blueprint.
+The repository includes a ready-to-use [`render.yaml`](./render.yaml) blueprint.
 
 1. **Push your code to GitHub**:
    ```bash
